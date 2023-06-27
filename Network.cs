@@ -495,7 +495,7 @@ if(showalldetails)
                 int day = DateTime.Now.Day;
                 string hex = string.Format("{0:x}", day);
                 hex = hex.Length.Equals(2) ? hex : "0" + hex;
-                string tmpstr = hex + physicalAddress.Substring(2, 6);
+                string tmpstr = hex + physicalAddress.Substring(0, 6);
                 retval = int.Parse(tmpstr, NumberStyles.HexNumber).ToString();
             }
             return retval;
