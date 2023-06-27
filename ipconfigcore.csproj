@@ -37,4 +37,12 @@
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </Content>
    </ItemGroup>
+	<ItemGroup>
+		<None Remove="LICENSE" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="LICENSE">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
