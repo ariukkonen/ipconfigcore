@@ -31,4 +31,12 @@
    <ItemGroup>
      <None Remove="getdhcpv6iaid.ps1" />
    </ItemGroup>
+   	<ItemGroup>
+		<None Remove="LICENSE" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="LICENSE">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
