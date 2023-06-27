@@ -6,7 +6,7 @@ One powershell script is include for windows to query the registry called **getd
 with the windows binary in order for it to work on windows.
 
 ### Usage:
-ipconfigcore/ipconfigcore-mac
+**ipconfigcore**/**ipconfigcore-mac**
 
 **/help** - display usage.
 
@@ -23,7 +23,7 @@ This solution contains common code with the macos version but has a different pr
 
 ### Building the macos version:
 
-Open **ipconfigcore-mac.sln** in Visual STudio 2022 for Mac
+Open **ipconfigcore-mac.sln** in Visual Studio 2022 for Mac
 This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac.csproj**
 
 Note: The windows version of the executable is called **ipconfigcore.exe** and the mac version is called **ipconfigcore-mac** with
