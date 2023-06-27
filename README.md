@@ -6,13 +6,17 @@ One powershell script is include for windows to query the registry called **getd
 with the windows binary in order for it to work on windows.
 
 ### Usage:
-**ipconfigcore**/**ipconfigcore-mac**
+**ipconfigcore**
+
+ - without a switch displays interfaces with less details
+
+**/about** - displays About screen.
+
+**/all** - display all interfaces
 
 **/help** - display usage.
 
 **/ips** - display list of active IP addresses.
-
-**/all** - display all interfaces
 
 **/license** - displays the license
 
@@ -26,5 +30,5 @@ This solution contains common code with the macos version but has a different pr
 Open **ipconfigcore-mac.sln** in Visual Studio 2022 for Mac
 This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac.csproj**
 
-Note: The windows version of the executable is called **ipconfigcore.exe** and the mac version is called **ipconfigcore-mac** with
+Note: The windows version of the executable is called **ipconfigcore.exe** and the mac version is called **ipconfigcore** with
 both bundling the **LICENSE** file with the executable and the windows version also bundles with the **getdhcpv6iaid.ps1** powershell script.

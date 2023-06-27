@@ -26,7 +26,10 @@ namespace ipconfigcore
                 {
                     DisplayCopyright();
                 }
-
+                else if (args.Contains("/about", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    DisplayAbout();
+                }
                 else if (args.Contains("/help", StringComparer.InvariantCultureIgnoreCase))
                 {
                     PrintUsage();
@@ -38,7 +41,23 @@ namespace ipconfigcore
                 }
             }
         }
+        private static void DisplayAbout()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string AppName = assembly.GetName().ToString().Split(',')[0] + ' ' + assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault().Version;
+            // GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
 
+            var descriptionAttribute = assembly
+         .GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false)
+         .OfType<AssemblyDescriptionAttribute>()
+         .FirstOrDefault();
+
+            if (descriptionAttribute != null)
+            {
+                Console.WriteLine(AppName);
+                Console.WriteLine(descriptionAttribute.Description);
+            }
+        }
         private static void DisplayCopyright()
         {
             string licensetxt = @"BSD 2-Clause License
@@ -64,8 +83,9 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.";
-        Console.WriteLine(licensetxt);
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+";
+            Console.WriteLine(licensetxt);
         }
 
         private static void DisplaySummary()
@@ -94,10 +114,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.";
         private static void PrintUsage()
         {
             string AppName = Assembly.GetExecutingAssembly().GetName().ToString().Split(',')[0];
-            Console.WriteLine(AppName);
+            string version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+            Console.WriteLine(AppName+' '+ version);
+            Console.WriteLine(AppName + " without a switch displays interfaces with less details.");
+            Console.WriteLine("/about - displays About screen.");
+            Console.WriteLine("/all - display all interfaces");
             Console.WriteLine("/help - display usage.");
             Console.WriteLine("/ips - display list of active IP addresses.");
-            Console.WriteLine("/all - display all interfaces");
             Console.WriteLine("/license - displays the license");
         }
     }
