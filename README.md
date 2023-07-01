@@ -35,24 +35,25 @@ both bundling the **LICENSE** file with the executable and the windows version a
 
 ### How Platform specific compiler constants are defined
 The first step is to define the following conditions in the main **PropertyGroup**.
-```
-    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows> 
-    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX> 
-    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-    <Description>- a cross-platform implementation of ipconfig from windows.</Description>
-   ``` 
+```xml
+<IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows> 
+<IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX> 
+<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+<Description>- a cross-platform implementation of ipconfig from windows.</Description>
+``` 
 Next, we need to define three property groups defining constants that will use in programmer directives in the code:
+```xml
+<PropertyGroup Condition="'$(IsWindows)'=='true'">
+  <DefineConstants>Windows</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition="'$(IsOSX)'=='true'">
+  <DefineConstants>OSX</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition="'$(IsLinux)'=='true'">
+  <DefineConstants>Linux</DefineConstants>
+</PropertyGroup>
  ```
- <PropertyGroup Condition="'$(IsWindows)'=='true'">
-    <DefineConstants>Windows</DefineConstants>
-   </PropertyGroup>
-   <PropertyGroup Condition="'$(IsOSX)'=='true'">
-    <DefineConstants>OSX</DefineConstants>
-   </PropertyGroup>
-   <PropertyGroup Condition="'$(IsLinux)'=='true'">
-    <DefineConstants>Linux</DefineConstants>
-   </PropertyGroup>
-   ```
+
 Finally, we write some operating specific code blocks:
 ```
 #if OSX
