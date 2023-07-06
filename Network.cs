@@ -203,7 +203,8 @@ if(showalldetails)
             Console.WriteLine("   Node Type . . . . . . . . . . . . : {0}", properties.NodeType);
 #if Windows
             Console.WriteLine("   IP Routing Enabled. . . . . . . . : {0}", properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No" );
-            Console.WriteLine("   WINS Proxy Enabled. . . . . . . . : {0}", ConvertBooltoYesNo(properties.IsWinsProxy));
+            if(GetOSPlatform().Equals("Windows"))
+                Console.WriteLine("   WINS Proxy Enabled. . . . . . . . : {0}", ConvertBooltoYesNo(properties.IsWinsProxy));
             netbiosstatus = GetNetBiosStatusinWindows();
 #endif
                 searchdomains.Add(properties.DomainName);
@@ -312,6 +313,7 @@ if(showalldetails)
                     if(showalldetails) 
                     {
 #if Windows
+                    if(GetOSPlatform().Equals("Windows"))
                         Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", ConvertBooltoYesNo(p.IsDhcpEnabled));
 #elif OSX
 
@@ -373,14 +375,17 @@ if(showalldetails)
                                 Console.WriteLine("   IPv4 Address. . . . . . . . . . . : {0}", ip.Address.ToString() + addresspreference);
                                 Console.WriteLine("   Subnet Mask . . . . . . . . . . . : {0}", ip.IPv4Mask.ToString());
 #if Windows
-                                if (showalldetails)
+                                if (GetOSPlatform().Equals("Windows")) 
                                 {
-                                    DateTime when;
-                                    string lifeTimeFormat = "MMMM dd, yyyy h:mm:ss tt";
-                                    when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
-                                    Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
-                                    when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
-                                    Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                    if (showalldetails)
+                                    {
+                                        DateTime when;
+                                        string lifeTimeFormat = "MMMM dd, yyyy h:mm:ss tt";
+                                        when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
+                                        Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
+                                        Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                    }
                                 }
 #elif OSX
                                  if (showalldetails)
@@ -507,6 +512,10 @@ if(showalldetails)
         private static string GetIAIDforWindow(string id) 
         {
             string returnvalue = "";
+            if (GetOSPlatform().Equals("Linux"))
+            {
+                return returnvalue;
+            }
             string result = string.Empty;
             string strWorkPath = System.AppContext.BaseDirectory;
             string strps1FilePath = System.IO.Path.Combine(strWorkPath, "getdhcpv6iaid.ps1");
@@ -534,6 +543,10 @@ if(showalldetails)
         private static string GetDUIDforWindows() 
         {
             string returnvalue = "";
+            if (GetOSPlatform().Equals("Linux")) 
+            { 
+                return returnvalue;
+            }
             string result = string.Empty;
             var command = "powershell";
             var arguments = " (Get-ItemProperty HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters).Dhcpv6DUID";
@@ -632,6 +645,10 @@ if(showalldetails)
         private static string GetNetBiosStatusinWindows()
         {
             string returnvalue = "Disabled";
+            if (GetOSPlatform().Equals("Linux"))
+            {
+                return returnvalue;
+            }
             string result = string.Empty;
             var command = "nbtstat";
             var arguments = " -n";
