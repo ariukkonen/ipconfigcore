@@ -380,7 +380,7 @@ if(showalldetails)
                                     if (showalldetails)
                                     {
                                         DateTime when;
-                                        string lifeTimeFormat = "MMMM dd, yyyy h:mm:ss tt";
+                                        string lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
                                         when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
                                         Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                         when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
@@ -392,7 +392,7 @@ if(showalldetails)
                                 {
                                     KeyValuePair<string,string> leaseinfo = GetLeaseInfoonMacOS(adapter.Name);
                                     string inputformat = "G";
-                                    string lifeTimeFormat = "dddd, MMMM dd, yyyy h:mm:ss tt";
+                                    string lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
                                     DateTime when = DateTime.ParseExact(leaseinfo.Key, inputformat, DateTimeFormatInfo.InvariantInfo);
                                     Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                     when = DateTime.ParseExact(leaseinfo.Value, inputformat, DateTimeFormatInfo.InvariantInfo);

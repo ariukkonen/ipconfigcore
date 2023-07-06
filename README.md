@@ -30,8 +30,14 @@ This solution contains common code with the macos version but has a different pr
 Open **ipconfigcore-mac.sln** in Visual Studio 2022 for Mac
 This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac.csproj**
 
-Note: The windows version of the executable is called **ipconfigcore.exe** and the mac version is called **ipconfigcore** with
-both bundling the **LICENSE** file with the executable and the windows version also bundles with the **getdhcpv6iaid.ps1** powershell script.\
+### Building the linux version:
+
+Open **ipconfigcore-linux.sln** in Visual Studio 2022 or later
+This solution contains common code with the windows version but has a different project file called **ipconfigcore-linux.csproj**
+
+
+Note: The windows version of the executable is called **ipconfigcore.exe** and the mac/linux version is called **ipconfigcore** with
+both bundling the **LICENSE** file with the executable and the windows version also bundles with the **getdhcpv6iaid.ps1** powershell script.
 
 ### How Platform specific compiler constants are defined
 The first step is to define the following conditions in the main **PropertyGroup**.
@@ -63,3 +69,5 @@ Finally, we write some operating specific code blocks:
 #endif
 ```
 The OSX code block will execute if the code is runing on MacOS.
+
+Note: Running the linux verison on WLS will not respect the Linux constant properly so there are additonal calls to GetOSPlatform() to deal with issue.
