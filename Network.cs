@@ -559,11 +559,15 @@ if(showalldetails)
                     result = process.StandardOutput.ReadToEnd();
                 }
                 process.WaitForExit();
+                if(returnvalue.Contains("is not recognized") || returnvalue.Contains("ObjectNotFound") || returnvalue.Contains("CommandNotFoundException"))
+                {
+                    returnvalue = "IAID retrieval Unsupported";
+                }
                 returnvalue = result.Trim().ReplaceLineEndings();
             }
             catch (Exception)
             {
-                returnvalue = "Unsupported";
+                returnvalue = "IAID retrieval Unsupported";
             }
             return returnvalue;
         }
