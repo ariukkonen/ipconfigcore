@@ -384,6 +384,7 @@ if(showalldetails)
                         {
                             if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                             {
+                                addresspreference = "(Preferred)";
                                 Console.WriteLine("   IPv4 Address. . . . . . . . . . . : {0}", ip.Address.ToString() + addresspreference);
                                 Console.WriteLine("   Subnet Mask . . . . . . . . . . . : {0}", ip.IPv4Mask.ToString());
 #if Windows
@@ -435,7 +436,15 @@ if(showalldetails)
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
-                                Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", GetIAIDforWindow(adapter.Id));
+                                if (versioninfo["Major"] >= 10)
+                                {
+                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", GetIAIDforWindow(adapter.Id));
+                                }
+                                else 
+                                {
+                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", "IAID retrieval Unsupported");
+
+                                }
                                 Console.WriteLine("   DHCPv6 Client DUID. . . . . . . . : {0}", DUID);
                             }
 #else
@@ -559,10 +568,6 @@ if(showalldetails)
                     result = process.StandardOutput.ReadToEnd();
                 }
                 process.WaitForExit();
-                if(returnvalue.Contains("is not recognized") || returnvalue.Contains("ObjectNotFound") || returnvalue.Contains("CommandNotFoundException"))
-                {
-                    returnvalue = "IAID retrieval Unsupported";
-                }
                 returnvalue = result.Trim().ReplaceLineEndings();
             }
             catch (Exception)
