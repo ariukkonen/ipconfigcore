@@ -161,6 +161,18 @@ namespace ipconfigcore
         public static void DisplayIPNetworkInterfaces(bool showalldetails = false) 
         {
             string netbiosstatus = "Unknown";
+            string lifeTimeFormat;
+            Dictionary<string, int> versioninfo = new Dictionary<string, int>();
+            GetOSVersion(versioninfo);
+            if (versioninfo["Major"].Equals(11) && GetOSPlatform().Equals("Windows"))
+            {
+                lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
+            }
+            else
+            {
+                lifeTimeFormat = "dddd, MMMM d, yyyy h:mm:ss tt";
+            }
+
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
             Console.WriteLine();
@@ -380,7 +392,6 @@ if(showalldetails)
                                     if (showalldetails)
                                     {
                                         DateTime when;
-                                        string lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
                                         when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
                                         Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                         when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
@@ -392,7 +403,6 @@ if(showalldetails)
                                 {
                                     KeyValuePair<string,string> leaseinfo = GetLeaseInfoonMacOS(adapter.Name);
                                     string inputformat = "G";
-                                    string lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
                                     DateTime when = DateTime.ParseExact(leaseinfo.Key, inputformat, DateTimeFormatInfo.InvariantInfo);
                                     Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                     when = DateTime.ParseExact(leaseinfo.Value, inputformat, DateTimeFormatInfo.InvariantInfo);
@@ -494,7 +504,17 @@ if(showalldetails)
             }
 
         }
-
+        public static void GetOSVersion(Dictionary<string,int>  info)
+        {
+            info.Add("Major", Environment.OSVersion.Version.Major);
+            info.Add("Minor", Environment.OSVersion.Version.Minor);
+            info.Add("Build", Environment.OSVersion.Version.Build);
+            if (GetOSPlatform().Equals("Windows"))
+            {
+                if (info["Major"].Equals(10) && info["Build"] >= 22000)
+                    info["Major"] = 11;
+            }
+        }
         private static string GetIAIDforMacOS(string physicalAddress)
         {
             string retval = string.Empty;
