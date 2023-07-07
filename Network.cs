@@ -537,27 +537,34 @@ if(showalldetails)
                 return returnvalue;
             }
             string result = string.Empty;
-            string strWorkPath = System.AppContext.BaseDirectory;
-            string strps1FilePath = System.IO.Path.Combine(strWorkPath, "getdhcpv6iaid.ps1");
-            var command = "powershell";
-            var arguments = string.Format(" {0} {1}",strps1FilePath,id.Replace("{","").Replace("}",""));
-            var processInfo = new ProcessStartInfo()
+            try
             {
-                FileName = command,
-                Arguments = arguments,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
+                string strWorkPath = System.AppContext.BaseDirectory;
+                string strps1FilePath = System.IO.Path.Combine(strWorkPath, "getdhcpv6iaid.ps1");
+                var command = "powershell";
+                var arguments = string.Format(" {0} {1}", strps1FilePath, id.Replace("{", "").Replace("}", ""));
+                var processInfo = new ProcessStartInfo()
+                {
+                    FileName = command,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
 
-            };
+                };
 
-            Process process = Process.Start(processInfo);   // Start that process.
-            while (!process.StandardOutput.EndOfStream)
-            {
-                result = process.StandardOutput.ReadToEnd();
+                Process process = Process.Start(processInfo);   // Start that process.
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    result = process.StandardOutput.ReadToEnd();
+                }
+                process.WaitForExit();
+                returnvalue = result.Trim().ReplaceLineEndings();
             }
-            process.WaitForExit();
-            returnvalue = result.Trim().ReplaceLineEndings();
+            catch (Exception)
+            {
+                returnvalue = "Unsupported";
+            }
             return returnvalue;
         }
         private static string GetDUIDforWindows() 
