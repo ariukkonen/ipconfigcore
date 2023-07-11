@@ -354,7 +354,10 @@ if(showalldetails)
                             {
                                 if (ipv6count.Equals(0) && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    addresspreference = "(Preferred)";
+                                    if (showalldetails)
+                                    {
+                                        addresspreference = "(Preferred)";
+                                    }
                                     Console.WriteLine("   IPv6 Address. . . . . . . . . . . : {0}", ip.Address.ToString()+ addresspreference);
                                 }
                                 else if (ipv6count > 0 && ip.Address.ToString().StartsWith("2001:"))
@@ -384,7 +387,10 @@ if(showalldetails)
                         {
                             if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                             {
-                                addresspreference = "(Preferred)";
+                                if (showalldetails)
+                                {
+                                    addresspreference = "(Preferred)";
+                                }
                                 Console.WriteLine("   IPv4 Address. . . . . . . . . . . : {0}", ip.Address.ToString() + addresspreference);
                                 Console.WriteLine("   Subnet Mask . . . . . . . . . . . : {0}", ip.IPv4Mask.ToString());
 #if Windows
