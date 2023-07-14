@@ -400,9 +400,12 @@ if(showalldetails)
                                     {
                                         DateTime when;
                                         when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
-                                        Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
-                                        when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
-                                        Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        if(when.Year <= DateTime.Now.Year)
+                                        {
+                                            Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                            when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
+                                            Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        }
                                     }
                                 }
 #elif OSX
@@ -466,14 +469,22 @@ if(showalldetails)
 
 #endif
                             IPAddressCollection dnsServers = adapterProperties.DnsAddresses;
-                            if (dnsServers.Count > 0)
+                            List<IPAddress>  filtereddnslist =  new List<IPAddress>();
+                            foreach (var dnsserver in dnsServers)
                             {
-                                Console.WriteLine("   DNS Servers . . . . . . . . . . . : {0}", dnsServers[0].ToString());
+                                if (!dnsserver.ToString().Contains("fec0:0:0:ffff")) 
+                                {
+                                    filtereddnslist.Add(dnsserver);
+                                }
+                            }
+                            if (filtereddnslist.Count > 0)
+                            {
+                                Console.WriteLine("   DNS Servers . . . . . . . . . . . : {0}", filtereddnslist[0].ToString());
                                 int i = 1;
-                                while (i < dnsServers.Count)
+                                while (i < filtereddnslist.Count)
                                 {
 
-                                Console.WriteLine("                                       {0}", dnsServers[i].ToString());
+                                Console.WriteLine("                                       {0}", filtereddnslist[i].ToString());
                                     i++;
                                 }
                             }
