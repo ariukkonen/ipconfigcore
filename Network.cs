@@ -162,9 +162,10 @@ namespace ipconfigcore
         {
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
+            string platform = GetOSPlatform();
             Dictionary<string, int> versioninfo = new Dictionary<string, int>();
-            GetOSVersion(versioninfo);
-            if (versioninfo["Major"].Equals(11) && GetOSPlatform().Equals("Windows"))
+            GetOSVersion(versioninfo,platform);
+            if (versioninfo["Major"].Equals(11) && platform.Equals("Windows"))
             {
                 lifeTimeFormat = "MMMM d, yyyy h:mm:ss tt";
             }
@@ -176,7 +177,7 @@ namespace ipconfigcore
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
             Console.WriteLine();
-            Console.WriteLine("{0} IP Configuration ", GetOSPlatform());
+            Console.WriteLine("{0} IP Configuration ", platform);
             Console.WriteLine();
 if(showalldetails) 
             {
@@ -213,42 +214,42 @@ if(showalldetails)
             Console.WriteLine("   Host Name . . . . . . . . . . . . : {0}", properties.HostName);
             Console.WriteLine("   Primary Dns Suffix  . . . . . . . : {0}", properties.DomainName);
             Console.WriteLine("   Node Type . . . . . . . . . . . . : {0}", properties.NodeType);
+            Console.WriteLine("   IP Routing Enabled. . . . . . . . : {0}", properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
 #if Windows
-            Console.WriteLine("   IP Routing Enabled. . . . . . . . : {0}", properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No" );
-            if(GetOSPlatform().Equals("Windows"))
+            if (platform.Equals("Windows")) 
+            {
                 Console.WriteLine("   WINS Proxy Enabled. . . . . . . . : {0}", ConvertBooltoYesNo(properties.IsWinsProxy));
-            netbiosstatus = GetNetBiosStatusinWindows();
+                netbiosstatus = GetNetBiosStatusinWindows();
+            }
 #endif
-                searchdomains.Add(properties.DomainName);
-                foreach (NetworkInterface adapter in nics)
+            searchdomains.Add(properties.DomainName);
+            foreach (NetworkInterface adapter in nics)
+            {
+                IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
+                if (!string.IsNullOrEmpty(adapterProperties.DnsSuffix))
                 {
-                    IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
-                    if (!string.IsNullOrEmpty(adapterProperties.DnsSuffix))
+                    if (!searchdomains.Contains(adapterProperties.DnsSuffix))
                     {
-                        if (!searchdomains.Contains(adapterProperties.DnsSuffix))
-                        {
-                            searchdomains.Add(adapterProperties.DnsSuffix);
-                        }
+                        searchdomains.Add(adapterProperties.DnsSuffix);
                     }
                 }
-
+            }
 #endif
-                if (!searchdomains.Count.Equals(0))
+            if (!searchdomains.Count.Equals(0))
+            {
+                    Console.WriteLine("   DNS Suffix Search List. . . . . . : {0}", searchdomains[0]);
+                for (int i = 1; i < searchdomains.Count; i++)
                 {
-                        Console.WriteLine("   DNS Suffix Search List. . . . . . : {0}", searchdomains[0]);
-                    for (int i = 1; i < searchdomains.Count; i++)
-                    {
-                        Console.WriteLine("                                       {0}", searchdomains[i]);
-                    }
-
+                    Console.WriteLine("                                       {0}", searchdomains[i]);
                 }
 
             }
 
+        }
 #if OSX
             string duid = GetDUIDforMacOS();
 #elif Windows
-            string DUID = GetDUIDforWindows();
+            string DUID = platform.Equals("Windows") ? GetDUIDforWindows() : string.Empty;
 #endif
 
             foreach (NetworkInterface adapter in nics)
@@ -325,7 +326,7 @@ if(showalldetails)
                     if(showalldetails) 
                     {
 #if Windows
-                    if(GetOSPlatform().Equals("Windows"))
+                    if(platform.Equals("Windows"))
                         Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", ConvertBooltoYesNo(p.IsDhcpEnabled));
 #elif OSX
 
@@ -394,7 +395,7 @@ if(showalldetails)
                                 Console.WriteLine("   IPv4 Address. . . . . . . . . . . : {0}", ip.Address.ToString() + addresspreference);
                                 Console.WriteLine("   Subnet Mask . . . . . . . . . . . : {0}", ip.IPv4Mask.ToString());
 #if Windows
-                                if (GetOSPlatform().Equals("Windows")) 
+                                if (platform.Equals("Windows")) 
                                 {
                                     if (showalldetails)
                                     {
@@ -445,7 +446,7 @@ if(showalldetails)
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
-                                if (versioninfo["Major"] >= 10)
+                                if (versioninfo["Major"] >= 10 && platform.Equals("Windows"))
                                 {
                                     Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", GetIAIDforWindow(adapter.Id));
                                 }
@@ -530,12 +531,12 @@ if(showalldetails)
             }
 
         }
-        public static void GetOSVersion(Dictionary<string,int>  info)
+        public static void GetOSVersion(Dictionary<string,int>  info, string platform)
         {
             info.Add("Major", Environment.OSVersion.Version.Major);
             info.Add("Minor", Environment.OSVersion.Version.Minor);
             info.Add("Build", Environment.OSVersion.Version.Build);
-            if (GetOSPlatform().Equals("Windows"))
+            if (platform.Equals("Windows"))
             {
                 if (info["Major"].Equals(10) && info["Build"] >= 22000)
                     info["Major"] = 11;
@@ -558,10 +559,6 @@ if(showalldetails)
         private static string GetIAIDforWindow(string id) 
         {
             string returnvalue = "";
-            if (GetOSPlatform().Equals("Linux"))
-            {
-                return returnvalue;
-            }
             string result = string.Empty;
             try
             {
@@ -596,10 +593,6 @@ if(showalldetails)
         private static string GetDUIDforWindows() 
         {
             string returnvalue = "";
-            if (GetOSPlatform().Equals("Linux")) 
-            { 
-                return returnvalue;
-            }
             string result = string.Empty;
             var command = "powershell";
             var arguments = " (Get-ItemProperty HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters).Dhcpv6DUID";
@@ -698,10 +691,6 @@ if(showalldetails)
         private static string GetNetBiosStatusinWindows()
         {
             string returnvalue = "Disabled";
-            if (GetOSPlatform().Equals("Linux"))
-            {
-                return returnvalue;
-            }
             string result = string.Empty;
             var command = "nbtstat";
             var arguments = " -n";
