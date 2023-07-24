@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace ipconfigcore
@@ -163,6 +162,8 @@ namespace ipconfigcore
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
             string platform = GetOSPlatform();
+            Dictionary<string, string> idcache = new Dictionary<string, string>();
+            bool useidcache = false;
             Dictionary<string, int> versioninfo = new Dictionary<string, int>();
             GetOSVersion(versioninfo,platform);
             if (versioninfo["Major"].Equals(11) && platform.Equals("Windows"))
@@ -173,7 +174,14 @@ namespace ipconfigcore
             {
                 lifeTimeFormat = "dddd, MMMM d, yyyy h:mm:ss tt";
             }
-
+            if (platform.Equals("Windows") || platform.Equals("MacOS")) 
+            {
+               LoadIDCachefromTempFolder(idcache);
+               if(idcache.Count > 0)
+               {
+                    useidcache = true;
+                }
+            }
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
             Console.WriteLine();
@@ -247,9 +255,33 @@ if(showalldetails)
 
         }
 #if OSX
-            string duid = GetDUIDforMacOS();
+            string duid = string.Empty
+            if (idcache.ContainsKey("DUID"))
+            {
+                duid = idcache["DUID"];
+            }
+            else 
+            {
+                useidcache = false;
+                duid = GetDUIDforMacOS()
+                idcache.Add("DUID", DUID);
+            }
+            
 #elif Windows
-            string DUID = platform.Equals("Windows") ? GetDUIDforWindows() : string.Empty;
+            string DUID = string.Empty;
+            if (platform.Equals("Windows")) 
+            {
+                if (idcache.ContainsKey("DUID"))
+                {
+                    DUID = idcache["DUID"];
+                }
+                else 
+                {
+                    useidcache = false;
+                    DUID = GetDUIDforWindows();
+                    idcache.Add("DUID", DUID);
+                }
+            }
 #endif
 
             foreach (NetworkInterface adapter in nics)
@@ -448,7 +480,11 @@ if(showalldetails)
                             {
                                 if (versioninfo["Major"] >= 10 && platform.Equals("Windows"))
                                 {
-                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", GetIAIDforWindow(adapter.Id));
+                                    if (!idcache.ContainsKey(adapter.Id)) 
+                                    {
+                                        useidcache = false;
+                                    }
+                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}",useidcache ? idcache[adapter.Id] : GetIAIDforWindow(adapter.Id, idcache));
                                 }
                                 else 
                                 {
@@ -464,7 +500,11 @@ if(showalldetails)
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
-                                Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", GetIAIDforMacOS(macaddress));
+                                if (!idcache.ContainsKey(macaddress)) 
+                                {
+                                    useidcache = false;
+                                }
+                                Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", useidcache ? idcache[macaddress] : GetIAIDforMacOS(macaddress, idcache));
                                 Console.WriteLine("   DHCPv6 Client DUID. . . . . . . . : {0}", duid);
                             }
 
@@ -529,8 +569,50 @@ if(showalldetails)
                     }
                 }
             }
-
+            if(!useidcache && idcache.Count > 0)
+            {
+                WriteIDCache(idcache);
+            }
         }
+
+        private static void WriteIDCache(Dictionary<string, string> idcache)
+        {
+            string tempPath = System.IO.Path.GetTempPath();
+            string tempfilename = System.IO.Path.Combine(tempPath, "ipconfig_cache.txt");
+
+            using (StreamWriter file = new StreamWriter(tempfilename))
+                foreach (var entry in idcache)
+                    file.WriteLine("{0}={1}", entry.Key, entry.Value);
+        }
+
+        private static void LoadIDCachefromTempFolder(Dictionary<string, string> idvalues)
+        {
+            string tempPath = System.IO.Path.GetTempPath();
+            string tempfilename = System.IO.Path.Combine(tempPath, "ipconfig_cache.txt");
+            if (File.Exists(tempfilename))
+            {
+                DateTime modifiedon = File.GetLastWriteTime(tempPath);
+                DateTime now = DateTime.Now;
+                if(modifiedon < now.AddHours(-1))
+                {
+                    File.Delete(tempfilename);
+                    return;
+                }
+                using(StreamReader sr = new StreamReader(tempfilename))
+{
+                    string _line;
+                    while ((_line = sr.ReadLine()) != null)
+                    {
+                        string[] keyvalue = _line.Split('=');
+                        if (keyvalue.Length == 2)
+                        {
+                            idvalues.Add(keyvalue[0], keyvalue[1]);
+                        }
+                    }
+                }
+            }
+        }
+
         public static void GetOSVersion(Dictionary<string,int>  info, string platform)
         {
             info.Add("Major", Environment.OSVersion.Version.Major);
@@ -542,7 +624,7 @@ if(showalldetails)
                     info["Major"] = 11;
             }
         }
-        private static string GetIAIDforMacOS(string physicalAddress)
+        private static string GetIAIDforMacOS(string physicalAddress, Dictionary<string,string> idcache)
         {
             string retval = string.Empty;
             if (!string.IsNullOrEmpty(physicalAddress))
@@ -552,11 +634,15 @@ if(showalldetails)
                 hex = hex.Length.Equals(2) ? hex : "0" + hex;
                 string tmpstr = hex + physicalAddress.Substring(0, 6);
                 retval = int.Parse(tmpstr, NumberStyles.HexNumber).ToString();
+                if (!idcache.ContainsKey(physicalAddress))
+                {
+                    idcache.Add(physicalAddress, retval);
+                }
             }
             return retval;
         }
 
-        private static string GetIAIDforWindow(string id) 
+        private static string GetIAIDforWindow(string id,Dictionary<string,string> iaidcache) 
         {
             string returnvalue = "";
             string result = string.Empty;
@@ -583,6 +669,10 @@ if(showalldetails)
                 }
                 process.WaitForExit();
                 returnvalue = result.Trim().ReplaceLineEndings();
+                if(!iaidcache.ContainsKey(id))
+                {
+                    iaidcache.Add(id, returnvalue);
+                }
             }
             catch (Exception)
             {
