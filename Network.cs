@@ -446,12 +446,15 @@ if(showalldetails)
 #elif OSX
                                  if (showalldetails)
                                 {
-                                    KeyValuePair<string,string> leaseinfo = GetLeaseInfoonMacOS(adapter.Name);
-                                    string inputformat = "G";
-                                    DateTime when = DateTime.ParseExact(leaseinfo.Key, inputformat, DateTimeFormatInfo.InvariantInfo);
-                                    Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
-                                    when = DateTime.ParseExact(leaseinfo.Value, inputformat, DateTimeFormatInfo.InvariantInfo);
-                                    Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                    KeyValuePair<string, string> leaseinfo = GetLeaseInfoonMacOS(adapter.Name);
+                                    if (!leaseinfo.Equals(default(KeyValuePair<string, string>)))
+                                    {
+                                        string inputformat = "G";
+                                        DateTime when = DateTime.ParseExact(leaseinfo.Key, inputformat, DateTimeFormatInfo.InvariantInfo);
+                                        Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        when = DateTime.ParseExact(leaseinfo.Value, inputformat, DateTimeFormatInfo.InvariantInfo);
+                                        Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                    }
                                 }
 #endif
                             }
@@ -848,6 +851,7 @@ if(showalldetails)
                 Arguments = arguments,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
 
             };
@@ -894,59 +898,66 @@ if(showalldetails)
         public static KeyValuePair<string,string> GetLeaseInfoonMacOS(string interfacename)
         {
             KeyValuePair<string, string> returnval = new KeyValuePair<string, string>();
-            string result = string.Empty;
-            var command = "ipconfig";
-            var arguments = string.Format(" getsummary {0}", interfacename);
-            var processInfo = new ProcessStartInfo()
+            try
             {
-                FileName = command,
-                Arguments = arguments,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-
-            };
-
-            Process process = Process.Start(processInfo);   // Start that process.
-            while (!process.StandardOutput.EndOfStream)
-            {
-                result = process.StandardOutput.ReadToEnd();
-            }
-            process.WaitForExit();
-            if (result.Contains("LeaseExpirationTime") && result.Contains("LeaseStartTime"))
-            {
-                string aLine;
-                string leaseStart = string.Empty;
-                string leaseExpiry = string.Empty;
-
-                StringReader strReader = new StringReader(result);
-                while (true)
+                string result = string.Empty;
+                var command = "ipconfig";
+                var arguments = string.Format(" getsummary {0}", interfacename);
+                var processInfo = new ProcessStartInfo()
                 {
-                    aLine = strReader.ReadLine();
-                    if (aLine != null)
+                    FileName = command,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                Process process = Process.Start(processInfo);   // Start that process.
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    result = process.StandardOutput.ReadToEnd();
+                }
+                process.WaitForExit();
+                if (result.Contains("LeaseExpirationTime") && result.Contains("LeaseStartTime"))
+                {
+                    string aLine;
+                    string leaseStart = string.Empty;
+                    string leaseExpiry = string.Empty;
+
+                    StringReader strReader = new StringReader(result);
+                    while (true)
                     {
-                        if (aLine.Contains("LeaseExpirationTime"))
+                        aLine = strReader.ReadLine();
+                        if (aLine != null)
                         {
-                            leaseExpiry = aLine.Replace("LeaseExpirationTime :", "").Replace('\n', ' ').Trim();
+                            if (aLine.Contains("LeaseExpirationTime"))
+                            {
+                                leaseExpiry = aLine.Replace("LeaseExpirationTime :", "").Replace('\n', ' ').Trim();
+                            }
+                            if (aLine.Contains("LeaseStartTime"))
+                            {
+                                leaseStart = aLine.Replace("LeaseStartTime :", "").Replace('\n', ' ').Trim();
+                            }
+                            if (!string.IsNullOrEmpty(leaseExpiry) && !string.IsNullOrEmpty(leaseStart))
+                            {
+                                returnval = new KeyValuePair<string, string>(leaseStart, leaseExpiry);
+                                break;
+                            }
                         }
-                        if (aLine.Contains("LeaseStartTime"))
+                        else
                         {
-                            leaseStart = aLine.Replace("LeaseStartTime :", "").Replace('\n',' ').Trim();
-                        }
-                        if (!string.IsNullOrEmpty(leaseExpiry) && !string.IsNullOrEmpty(leaseStart))
-                        {
-                            returnval = new KeyValuePair<string, string>(leaseStart,leaseExpiry);
                             break;
                         }
-                    }
-                    else
-                    {
-                        break;
-                    }
 
+                    }
                 }
             }
-                return returnval;
+            catch (Exception ex)
+            {
+
+            }
+            return returnval;
         }
         public static List<IPAddress?> GetAllIPAddresses()
         {
