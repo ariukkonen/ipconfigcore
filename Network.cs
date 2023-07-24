@@ -255,7 +255,7 @@ if(showalldetails)
 
         }
 #if OSX
-            string duid = string.Empty
+            string duid = string.Empty;
             if (idcache.ContainsKey("DUID"))
             {
                 duid = idcache["DUID"];
@@ -263,8 +263,8 @@ if(showalldetails)
             else 
             {
                 useidcache = false;
-                duid = GetDUIDforMacOS()
-                idcache.Add("DUID", DUID);
+                duid = GetDUIDforMacOS();
+                idcache.Add("DUID", duid);
             }
             
 #elif Windows
