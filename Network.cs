@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -577,8 +579,8 @@ if(showalldetails)
 
         private static void WriteIDCache(Dictionary<string, string> idcache)
         {
-            string tempPath = System.IO.Path.GetTempPath();
-            string tempfilename = System.IO.Path.Combine(tempPath, "ipconfig_cache.txt");
+            string tempPath = Path.GetTempPath();
+            string tempfilename = Path.Combine(tempPath, "ipconfig_cache.txt");
 
             using (StreamWriter file = new StreamWriter(tempfilename))
                 foreach (var entry in idcache)
@@ -587,11 +589,13 @@ if(showalldetails)
 
         private static void LoadIDCachefromTempFolder(Dictionary<string, string> idvalues)
         {
-            string tempPath = System.IO.Path.GetTempPath();
-            string tempfilename = System.IO.Path.Combine(tempPath, "ipconfig_cache.txt");
+            string tempPath = Path.GetTempPath();
+            string tempfilename = Path.Combine(tempPath, "ipconfig_cache.txt");
             if (File.Exists(tempfilename))
             {
-                DateTime modifiedon = File.GetLastWriteTime(tempPath);
+                var info = new FileInfo(tempfilename);
+                info.Refresh();
+                DateTime modifiedon = info.LastWriteTime;
                 DateTime now = DateTime.Now;
                 if(modifiedon < now.AddHours(-1))
                 {
