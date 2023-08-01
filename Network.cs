@@ -496,7 +496,9 @@ if(showalldetails)
                                     Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", "IAID retrieval Unsupported");
 
                                 }
+#if !Linux
                                 Console.WriteLine("   DHCPv6 Client DUID. . . . . . . . : {0}", DUID);
+#endif
                             }
 #else
                             if (!string.IsNullOrEmpty(macOSdhcpaddress))
