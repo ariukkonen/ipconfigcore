@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace ipconfigcore
@@ -229,7 +230,16 @@ if(showalldetails)
             if (platform.Equals("Windows")) 
             {
                 Console.WriteLine("   WINS Proxy Enabled. . . . . . . . : {0}", ConvertBooltoYesNo(properties.IsWinsProxy));
-                netbiosstatus = GetNetBiosStatusinWindows();
+                    if (idcache.ContainsKey("NETBIOS"))
+                    {
+                        netbiosstatus = idcache["NETBIOS"];
+                    }
+                    else
+                    {
+                        useidcache = false;
+                        netbiosstatus = GetNetBiosStatusinWindows();
+                        idcache.Add("NETBIOS", netbiosstatus);
+                    }
             }
 #endif
             searchdomains.Add(properties.DomainName);
@@ -791,8 +801,8 @@ if(showalldetails)
         {
             string returnvalue = "Disabled";
             string result = string.Empty;
-            var command = "nbtstat";
-            var arguments = " -n";
+            var command = "powershell";
+            var arguments = " Get-WmiObject Win32_ComputerSystem";
             var processInfo = new ProcessStartInfo()
             {
                 FileName = command,
@@ -809,10 +819,33 @@ if(showalldetails)
                 result = process.StandardOutput.ReadToEnd();
             }
             process.WaitForExit();
-            if (result.Contains("NetBIOS Local Name Table")) 
+            if (result.Contains("Domain")) 
             {
-                returnvalue = "Enabled";
-            } 
+                string aLine = string.Empty;
+                string netbiosdomain = string.Empty;
+                StringReader strReader = new StringReader(result);
+                while (true)
+                {
+                    aLine = strReader.ReadLine();
+                    if (aLine != null)
+                    {
+                        if (aLine.Contains("Domain              :"))
+                        {
+                            netbiosdomain = aLine.Replace("Domain              :", "").Trim();
+
+                        }
+                        if (!string.IsNullOrEmpty(netbiosdomain))
+                        {
+                            returnvalue = "Enabled";
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
             return returnvalue;
         }
         public static string GetDHCPServeronMacOS(string interfacename)
