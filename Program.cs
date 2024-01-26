@@ -107,7 +107,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 }
                 Console.WriteLine("{0}{1} Address: {2} {3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString(), interfacename);
             }
-            string publicip = Network.GetPublicIpAddress();
+            string publicip = Network.GetPublicIpAddressAsync().Result;
             Console.WriteLine("Public IPv{0} Address: {1}",publicip.Contains(":") ? "6" :"4", publicip);
 
         }

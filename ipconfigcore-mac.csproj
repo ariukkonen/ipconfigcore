@@ -33,6 +33,7 @@
    <PropertyGroup Condition="'$(IsLinux)'=='true'">
     <DefineConstants>Linux</DefineConstants>
    </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
    <ItemGroup>
      <None Remove="getdhcpv6iaid.ps1" />
    </ItemGroup>

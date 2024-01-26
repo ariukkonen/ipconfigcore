@@ -1,11 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace ipconfigcore
@@ -13,6 +10,7 @@ namespace ipconfigcore
     public static class Network
     {
         static List<string> exceptionpatterns = new List<string> { "fe80::1%1", "::1", "127.0.0.1" };
+        static readonly HttpClient client = new HttpClient();
 
         public static string GetFQDN()
         {
@@ -29,23 +27,15 @@ namespace ipconfigcore
 
             return hostName;
         }
-        public static string GetPublicIpAddress(bool throwexception = false)
+        public static async Task<string> GetPublicIpAddressAsync(bool throwexception = false)
         {
             string publicIPAddress = string.Empty;
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("curl");
             try
             {
-                var request = (HttpWebRequest)WebRequest.Create("http://ifconfig.me");
-
-                request.UserAgent = "curl"; // this will tell the server to return the information as if the request was made by the linux "curl" command
-
-                request.Method = "GET";
-                using (WebResponse response = request.GetResponse())
-                {
-                    using (var reader = new StreamReader(response.GetResponseStream()))
-                    {
-                        publicIPAddress = reader.ReadToEnd();
-                    }
-                }
+                using HttpResponseMessage response = await client.GetAsync("http://ifconfig.me");
+                response.EnsureSuccessStatusCode();
+                publicIPAddress = await response.Content.ReadAsStringAsync();
             }
             catch
             {
