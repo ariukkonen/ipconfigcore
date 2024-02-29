@@ -578,11 +578,11 @@ if(showalldetails)
             }
             if(!useidcache && idcache.Count > 0)
             {
-                WriteIDCache(idcache);
+                WriteIDCacheToTempFolder(idcache);
             }
         }
 
-        private static void WriteIDCache(Dictionary<string, string> idcache)
+        private static void WriteIDCacheToTempFolder(Dictionary<string, string> idcache)
         {
             string tempPath = Path.GetTempPath();
             string tempfilename = Path.Combine(tempPath, "ipconfig_cache.txt");
@@ -592,7 +592,7 @@ if(showalldetails)
                     file.WriteLine("{0}={1}", entry.Key, entry.Value);
         }
 
-        private static void LoadIDCachefromTempFolder(Dictionary<string, string> idvalues)
+        private static void LoadIDCachefromTempFolder(Dictionary<string, string> idcache)
         {
             string tempPath = Path.GetTempPath();
             string tempfilename = Path.Combine(tempPath, "ipconfig_cache.txt");
@@ -602,7 +602,7 @@ if(showalldetails)
                 info.Refresh();
                 DateTime modifiedon = info.LastWriteTime;
                 DateTime now = DateTime.Now;
-                if(modifiedon < now.AddHours(-1))
+                if(modifiedon < now.AddMinutes(-30))
                 {
                     File.Delete(tempfilename);
                     return;
@@ -615,7 +615,7 @@ if(showalldetails)
                         string[] keyvalue = _line.Split('=');
                         if (keyvalue.Length == 2)
                         {
-                            idvalues.Add(keyvalue[0], keyvalue[1]);
+                            idcache.Add(keyvalue[0], keyvalue[1]);
                         }
                     }
                 }
