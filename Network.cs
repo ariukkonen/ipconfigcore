@@ -114,6 +114,11 @@ namespace ipconfigcore
         }
         public static string FormatAsMacAddress(this string mac)
         {
+            if (string.IsNullOrEmpty(mac))
+            {
+                return string.Empty;
+            }
+
             string defaultmac = "00-00-00-00-00-00-00-E0";
             var regex = "^([a-fA-F0-9]{2}){6}$";
             try
@@ -354,8 +359,7 @@ if(showalldetails)
                     if (showalldetails)
                     {
                         Console.WriteLine("   Description . . . . . . . . . . . : {0}", adapter.Description);
-                        if (!string.IsNullOrEmpty(macaddress))
-                            Console.WriteLine("   Physical Address. . . . . . . . . : {0}", macaddress.FormatAsMacAddress());
+                        Console.WriteLine("   Physical Address. . . . . . . . . : {0}", macaddress.FormatAsMacAddress());
                     }
                     if(showalldetails) 
                     {
@@ -548,7 +552,6 @@ if(showalldetails)
                     if (showalldetails) 
                     {
                         Console.WriteLine("   Description . . . . . . . . . . . : {0}", adapter.Description);
-                        if (!string.IsNullOrEmpty(macaddress))
                         Console.WriteLine("   Physical Address. . . . . . . . . : {0}", macaddress.FormatAsMacAddress());
 
 #if Windows
