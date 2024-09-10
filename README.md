@@ -1,7 +1,7 @@
 # ipconfigcore
 ## ipcofigcore - Written by Ari Ukkonen
 
-**ipconfigcore** is a cross-platform implementation of ipconfig viewing functionality for windows and macos written in .NET 7 (Core).
+**ipconfigcore** is a cross-platform implementation of ipconfig viewing functionality for windows and macos written in .NET 8 (Core).
 One powershell script is included for windows to query the registry called **getdhcpv6iaid.ps1** and this script needs to be included
 with the windows binary in order for it to work on windows.
 
@@ -27,7 +27,7 @@ This solution contains common code with the macos version but has a different pr
 
 ### Building the macos version:
 
-Open **ipconfigcore-mac.sln** in Visual Studio 2022 for Mac
+Open **ipconfigcore-mac-rider.sln** in Rider IDE for MacOS.
 This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac.csproj**
 
 ### Building the linux version:
