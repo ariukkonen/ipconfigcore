@@ -28,7 +28,7 @@ This solution contains common code with the macos version but has a different pr
 ### Building the macos version:
 
 Open **ipconfigcore-mac-rider.sln** in Rider IDE for MacOS.
-This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac.csproj**
+This solution contains common code with the windows version but has a different project file called **ipconfigcore-mac-rider.csproj**
 
 ### Building the linux version:
 
