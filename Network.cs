@@ -219,7 +219,7 @@ if(showalldetails)
                 }
 
             Console.WriteLine("   Host Name {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, hostname);
-            Console.WriteLine("   Primary Dns Suffix  {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol, colonsymbol domain);
+            Console.WriteLine("   Primary Dns Suffix  {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol, colonsymbol, domain);
             Console.WriteLine("   Node Type {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, properties.NodeType);
             Console.WriteLine("   IP Routing Enabled{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
 #else
