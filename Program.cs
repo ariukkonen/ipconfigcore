@@ -8,36 +8,51 @@ namespace ipconfigcore
     {
         static void Main(string[] args)
         {
+            bool usenerdsymbols = false;
+
             if (args.Length == 0)
             {
-                Network.DisplayIPNetworkInterfaces();
+                Network.DisplayIPNetworkInterfaces(false,false);
             }
-            else if(args.Length == 1)
+            else if(args.Length >= 1)
             {
-                if (args.Contains("/all", StringComparer.InvariantCultureIgnoreCase))
+                if (args.Contains("--nerd"))
                 {
-                    Network.DisplayIPNetworkInterfaces(true);
+                    usenerdsymbols = true;
+                    Console.OutputEncoding = System.Text.Encoding.UTF8;
                 }
-                else if (args.Contains("/ips", StringComparer.InvariantCultureIgnoreCase))
+
+                if (args.Contains("/all", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-all", StringComparer.InvariantCultureIgnoreCase))
                 {
-                    DisplaySummary();
+                    Network.DisplayIPNetworkInterfaces(true, usenerdsymbols);
                 }
-                else if (args.Contains("/license", StringComparer.InvariantCultureIgnoreCase))
+                else if (args.Contains("/ips", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-ips", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    DisplaySummary(usenerdsymbols);
+                }
+                else if (args.Contains("/license", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-license", StringComparer.InvariantCultureIgnoreCase))
                 {
                     DisplayCopyright();
                 }
-                else if (args.Contains("/about", StringComparer.InvariantCultureIgnoreCase))
+                else if (args.Contains("/about", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-about", StringComparer.InvariantCultureIgnoreCase))
                 {
                     DisplayAbout();
                 }
-                else if (args.Contains("/help", StringComparer.InvariantCultureIgnoreCase))
+                else if (args.Contains("/help", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-help", StringComparer.InvariantCultureIgnoreCase))
                 {
                     PrintUsage();
                 }
                 else
                 {
-                    Console.WriteLine("Unknown switch.");
-                    PrintUsage();
+                    if (usenerdsymbols)
+                    {
+                        Network.DisplayIPNetworkInterfaces(false, usenerdsymbols);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unknown switch.");
+                        PrintUsage();
+                            }
                 }
             }
         }
@@ -62,7 +77,7 @@ namespace ipconfigcore
         {
             string licensetxt = @"BSD 2-Clause License
 
-Copyright (c) 2023, Ari Ukkonen, ariukkonen
+Copyright (c) 2024, Ari Ukkonen, ariukkonen
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -88,9 +103,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             Console.WriteLine(licensetxt);
         }
 
-        private static void DisplaySummary()
+        private static void DisplaySummary(bool usenerdsymbols)
         {
-            Console.WriteLine("{0} IP configuration Summary", Network.GetOSPlatform());
+            string platform = Network.GetOSPlatform();
+            
+            Console.WriteLine("{0} IP configuration Summary",usenerdsymbols ? Network.GetPlatformSymbol(platform) + " "+platform : platform);
             var ips = Network.GetAllIPAddresses();
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
             var hostname = Network.GetFQDN();
@@ -118,11 +135,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             string version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
             Console.WriteLine(AppName+' '+ version);
             Console.WriteLine(AppName + " without a switch displays interfaces with less details.");
-            Console.WriteLine("/about - displays About screen.");
-            Console.WriteLine("/all - display all interfaces");
-            Console.WriteLine("/help - display usage.");
-            Console.WriteLine("/ips - display list of active IP addresses.");
-            Console.WriteLine("/license - displays the license");
+            Console.WriteLine("Switches:");
+            Console.WriteLine("/-about - displays About screen.");
+            Console.WriteLine("/-all - display all interfaces");
+            Console.WriteLine("/-help - display usage.");
+            Console.WriteLine("/-ips - display list of active IP addresses.");
+            Console.WriteLine("/-license - displays the license");
+            Console.WriteLine("Options:");
+            Console.WriteLine("--nerd - displays information with nerd font symbols.");
         }
     }
 }

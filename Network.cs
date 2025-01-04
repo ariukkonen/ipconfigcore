@@ -155,8 +155,12 @@ namespace ipconfigcore
             return retval;
 
         }
-        public static void DisplayIPNetworkInterfaces(bool showalldetails = false) 
+        public static void DisplayIPNetworkInterfaces(bool showalldetails = false, bool usenerdsymbols = false) 
         {
+            string dotsymbol = usenerdsymbols ? "\uec07" : ".";
+            string colonsymbol = usenerdsymbols ? "\ueb10" : ":";
+            string startcap = usenerdsymbols ? "\u2261 " : "";
+            string endcap = usenerdsymbols ? " \u2261" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
             string platform = GetOSPlatform();
@@ -182,8 +186,10 @@ namespace ipconfigcore
             }
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+
+            string platformlabel = usenerdsymbols ? GetPlatformSymbol(platform) +" "+platform : platform;
             Console.WriteLine();
-            Console.WriteLine("{0} IP Configuration ", platform);
+            Console.WriteLine("{0} IP Configuration ", platformlabel);
             Console.WriteLine();
 if(showalldetails) 
             {
@@ -212,19 +218,19 @@ if(showalldetails)
                     }
                 }
 
-            Console.WriteLine("   Host Name . . . . . . . . . . . . : {0}", hostname);
-            Console.WriteLine("   Primary Dns Suffix  . . . . . . . : {0}", domain);
-            Console.WriteLine("   Node Type . . . . . . . . . . . . : {0}", properties.NodeType);
-            Console.WriteLine("   IP Routing Enabled. . . . . . . . : {0}", properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
+            Console.WriteLine("   Host Name {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, hostname);
+            Console.WriteLine("   Primary Dns Suffix  {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol, colonsymbol, domain);
+            Console.WriteLine("   Node Type {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, properties.NodeType);
+            Console.WriteLine("   IP Routing Enabled{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
 #else
-            Console.WriteLine("   Host Name . . . . . . . . . . . . : {0}", properties.HostName);
-            Console.WriteLine("   Primary Dns Suffix  . . . . . . . : {0}", properties.DomainName);
-            Console.WriteLine("   Node Type . . . . . . . . . . . . : {0}", properties.NodeType);
-            Console.WriteLine("   IP Routing Enabled. . . . . . . . : {0}", properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
+            Console.WriteLine("   Host Name {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, properties.HostName);
+            Console.WriteLine("   Primary Dns Suffix  {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, properties.DomainName);
+            Console.WriteLine("   Node Type {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, properties.NodeType);
+            Console.WriteLine("   IP Routing Enabled{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, properties.GetIPv4GlobalStatistics().NumberOfRoutes > 0 ? "Yes" : "No");
 #if Windows
             if (platform.Equals("Windows")) 
             {
-                Console.WriteLine("   WINS Proxy Enabled. . . . . . . . : {0}", ConvertBooltoYesNo(properties.IsWinsProxy));
+                Console.WriteLine("   WINS Proxy Enabled{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ConvertBooltoYesNo(properties.IsWinsProxy));
                     if (idcache.ContainsKey("NETBIOS"))
                     {
                         netbiosstatus = idcache["NETBIOS"];
@@ -252,7 +258,7 @@ if(showalldetails)
 #endif
             if (!searchdomains.Count.Equals(0))
             {
-                    Console.WriteLine("   DNS Suffix Search List. . . . . . : {0}", searchdomains[0]);
+                    Console.WriteLine("   DNS Suffix Search List{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, searchdomains[0]);
                 for (int i = 1; i < searchdomains.Count; i++)
                 {
                     Console.WriteLine("                                       {0}", searchdomains[i]);
@@ -293,7 +299,7 @@ if(showalldetails)
 
             foreach (NetworkInterface adapter in nics)
                 {
-                // Only display informatin for interfaces that support IPv4.
+                // Only display information for interfaces that support IPv4.
                 if (adapter.Supports(NetworkInterfaceComponent.IPv4) == false && (adapter.Supports(NetworkInterfaceComponent.IPv6) == false))
                 {
                     continue;
@@ -314,7 +320,7 @@ if(showalldetails)
 
                 string adaptertitle = GetAdapterTitle(adapter.NetworkInterfaceType.ToString(), adapter.Name);
                 Console.WriteLine();
-                Console.WriteLine("{0}:", adaptertitle);
+                Console.WriteLine("{0}{1}{2}",startcap,adaptertitle,endcap);
                 Console.WriteLine();
 
                 IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
@@ -354,27 +360,27 @@ if(showalldetails)
                     }
 #endif
 
-                    Console.WriteLine("   Connection-specific DNS Suffix  . : {0}", adapterProperties.DnsSuffix);
+                    Console.WriteLine("   Connection-specific DNS Suffix  {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.DnsSuffix);
 
                     if (showalldetails)
                     {
-                        Console.WriteLine("   Description . . . . . . . . . . . : {0}", adapter.Description);
-                        Console.WriteLine("   Physical Address. . . . . . . . . : {0}", macaddress.FormatAsMacAddress());
+                        Console.WriteLine("   Description {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapter.Description);
+                        Console.WriteLine("   Physical Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, macaddress.FormatAsMacAddress());
                     }
                     if(showalldetails) 
                     {
 #if Windows
                     if(platform.Equals("Windows"))
-                        Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", ConvertBooltoYesNo(p.IsDhcpEnabled));
+                        Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ConvertBooltoYesNo(p.IsDhcpEnabled));
 #elif OSX
 
                     if (!string.IsNullOrEmpty(macOSdhcpaddress))
                     {
-                        Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", "Yes");
+                        Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, "Yes");
                     }
                     else
                     {
-                        Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", "No");
+                        Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, "No");
                     }
 #endif
                     }
@@ -383,7 +389,7 @@ if(showalldetails)
                     {
                         if (showalldetails)
                         {
-                            Console.WriteLine("   Autoconfiguration Enabled . . . . : Yes");
+                            Console.WriteLine("   Autoconfiguration Enabled {0} {0} {0} {0} {1} Yes",dotsymbol,colonsymbol);
                         }
                         int ipv6count = 0;
                         // Display the IPv6 specific data.
@@ -397,15 +403,15 @@ if(showalldetails)
                                     {
                                         addresspreference = "(Preferred)";
                                     }
-                                    Console.WriteLine("   IPv6 Address. . . . . . . . . . . : {0}", ip.Address.ToString()+ addresspreference);
+                                    Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString()+ addresspreference);
                                 }
                                 else if (ipv6count > 0 && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    Console.WriteLine("   Temporary IPv6 Address. . . . . . : {0}", ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Temporary IPv6 Address{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("   Link-local IPv6 Address . . . . . : {0}", ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Link-local IPv6 Address {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
                                 }
                                 if (ip.Address.ToString().StartsWith("2001:"))
                                     ipv6count++;
@@ -416,7 +422,7 @@ if(showalldetails)
                     {
                         if(showalldetails)
                         {
-                            Console.WriteLine("   Autoconfiguration Enabled . . . . : False"); 
+                            Console.WriteLine("   Autoconfiguration Enabled {0} {0} {0} {0} {1} False", dotsymbol, colonsymbol); 
                         }
                     }
                     if (p != null)
@@ -430,8 +436,8 @@ if(showalldetails)
                                 {
                                     addresspreference = "(Preferred)";
                                 }
-                                Console.WriteLine("   IPv4 Address. . . . . . . . . . . : {0}", ip.Address.ToString() + addresspreference);
-                                Console.WriteLine("   Subnet Mask . . . . . . . . . . . : {0}", ip.IPv4Mask.ToString());
+                                Console.WriteLine("   IPv4 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
+                                Console.WriteLine("   Subnet Mask {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.IPv4Mask.ToString());
 #if Windows
                                 if (platform.Equals("Windows")) 
                                 {
@@ -441,9 +447,9 @@ if(showalldetails)
                                         when = DateTime.Now + (TimeSpan.FromSeconds(ip.AddressValidLifetime) - TimeSpan.FromSeconds(ip.DhcpLeaseLifetime));
                                         if(when.Year <= DateTime.Now.Year)
                                         {
-                                            Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                            Console.WriteLine("   Lease Obtained{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                             when = DateTime.Now + TimeSpan.FromSeconds(ip.AddressPreferredLifetime);
-                                            Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                            Console.WriteLine("   Lease Expires {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                         }
                                     }
                                 }
@@ -455,9 +461,9 @@ if(showalldetails)
                                     {
                                         string inputformat = "G";
                                         DateTime when = DateTime.ParseExact(leaseinfo.Key, inputformat, DateTimeFormatInfo.InvariantInfo);
-                                        Console.WriteLine("   Lease Obtained. . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        Console.WriteLine("   Lease Obtained{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                         when = DateTime.ParseExact(leaseinfo.Value, inputformat, DateTimeFormatInfo.InvariantInfo);
-                                        Console.WriteLine("   Lease Expires . . . . . . . . . . : {0}", when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
+                                        Console.WriteLine("   Lease Expires {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, when.ToString(lifeTimeFormat, CultureInfo.CurrentCulture));
                                     }
                                 }
 #endif
@@ -465,7 +471,7 @@ if(showalldetails)
                         }
                         if (adapterProperties.GatewayAddresses.Count > 0)
                         {
-                            Console.WriteLine("   Default Gateway . . . . . . . . . : {0}", adapterProperties.GatewayAddresses[0].Address.ToString());
+                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.GatewayAddresses[0].Address.ToString());
                             int i = 1;
                             while (i < adapterProperties.GatewayAddresses.Count)
                             {
@@ -475,7 +481,7 @@ if(showalldetails)
                         }
                         else 
                         {
-                            Console.WriteLine("   Default Gateway . . . . . . . . . :");
+                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1}",dotsymbol, colonsymbol);
                         }
                         if (showalldetails)
                         {
@@ -483,7 +489,7 @@ if(showalldetails)
 #if !OSX
                             foreach (var dhcpaddress in adapterProperties.DhcpServerAddresses)
                             {
-                                Console.WriteLine("   DHCP Server . . . . . . . . . . . : {0}", dhcpaddress);
+                                Console.WriteLine("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, dhcpaddress);
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
@@ -493,21 +499,21 @@ if(showalldetails)
                                     {
                                         useidcache = false;
                                     }
-                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}",useidcache ? idcache[adapter.Id] : GetIAIDforWindow(adapter.Id, idcache));
+                                    Console.WriteLine("   DHCPv6 IAID {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, useidcache ? idcache[adapter.Id] : GetIAIDforWindow(adapter.Id, idcache));
                                 }
                                 else 
                                 {
-                                    Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", "IAID retrieval Unsupported");
+                                    Console.WriteLine("   DHCPv6 IAID {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, "IAID retrieval Unsupported");
 
                                 }
 #if !Linux
-                                Console.WriteLine("   DHCPv6 Client DUID. . . . . . . . : {0}", DUID);
+                                Console.WriteLine("   DHCPv6 Client DUID{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, DUID);
 #endif
                             }
 #else
                             if (!string.IsNullOrEmpty(macOSdhcpaddress))
                             {
-                            Console.Write("   DHCP Server . . . . . . . . . . . : {0}", macOSdhcpaddress);
+                            Console.Write("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, macOSdhcpaddress);
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
@@ -515,8 +521,8 @@ if(showalldetails)
                                 {
                                     useidcache = false;
                                 }
-                                Console.WriteLine("   DHCPv6 IAID . . . . . . . . . . . : {0}", useidcache ? idcache[macaddress] : GetIAIDforMacOS(macaddress, idcache));
-                                Console.WriteLine("   DHCPv6 Client DUID. . . . . . . . : {0}", duid);
+                                Console.WriteLine("   DHCPv6 IAID {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, useidcache ? idcache[macaddress] : GetIAIDforMacOS(macaddress, idcache));
+                                Console.WriteLine("   DHCPv6 Client DUID{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, duid);
                             }
 
 #endif
@@ -531,7 +537,7 @@ if(showalldetails)
                             }
                             if (filtereddnslist.Count > 0)
                             {
-                                Console.WriteLine("   DNS Servers . . . . . . . . . . . : {0}", filtereddnslist[0].ToString());
+                                Console.WriteLine("   DNS Servers {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, filtereddnslist[0].ToString());
                                 int i = 1;
                                 while (i < filtereddnslist.Count)
                                 {
@@ -540,41 +546,41 @@ if(showalldetails)
                                     i++;
                                 }
                             }
-                            Console.WriteLine("   NetBIOS over Tcpip. . . . . . . . : {0}", netbiosstatus);
+                            Console.WriteLine("   NetBIOS over Tcpip{0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, netbiosstatus);
                         }
                     }
                 }
                 else 
                 {
-                        Console.WriteLine("   Media State . . . . . . . . . . . : Media disconnected");
-                        Console.WriteLine("   Connection-specific DNS Suffix  . : {0}", adapterProperties.DnsSuffix);
+                        Console.WriteLine("   Media State {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} Media disconnected", dotsymbol, colonsymbol);
+                        Console.WriteLine("   Connection-specific DNS Suffix  {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.DnsSuffix);
 
                     if (showalldetails) 
                     {
-                        Console.WriteLine("   Description . . . . . . . . . . . : {0}", adapter.Description);
-                        Console.WriteLine("   Physical Address. . . . . . . . . : {0}", macaddress.FormatAsMacAddress());
+                        Console.WriteLine("   Description {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapter.Description);
+                        Console.WriteLine("   Physical Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, macaddress.FormatAsMacAddress());
 
 #if Windows
                         if (p != null) 
                         { 
-                           Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", ConvertBooltoYesNo(p.IsDhcpEnabled));
+                           Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ConvertBooltoYesNo(p.IsDhcpEnabled));
                         }
                         else
                         {
-                        	Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", "No");
+                        	Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, "No");
                         }
 #endif
 #if OSX
-                        Console.WriteLine("   DHCP Enabled. . . . . . . . . . . : {0}", "No");
+                        Console.WriteLine("   DHCP Enabled{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}",dotsymbol,colonsymbol, "No");
 #endif
                         if (p6 != null)
                         {
-                            Console.WriteLine("   Autoconfiguration Enabled . . . . : Yes");
+                            Console.WriteLine("   Autoconfiguration Enabled {0} {0} {0} {0} {1} Yes", dotsymbol, colonsymbol);
 
                         }
                         else
                         {
-                            Console.WriteLine("   Autoconfiguration Enabled . . . . : No");
+                            Console.WriteLine("   Autoconfiguration Enabled {0} {0} {0} {0} {1} No", dotsymbol, colonsymbol);
                         }
                     }
                 }
@@ -583,6 +589,24 @@ if(showalldetails)
             {
                 WriteIDCacheToTempFolder(idcache);
             }
+        }
+
+        public static string GetPlatformSymbol(string platform)
+        {
+            string symbol = string.Empty;
+            switch (platform)
+            {
+                case "MacOS":
+                    symbol = "\ue711";
+                    break;
+                case "Windows":
+                    symbol = "\ue70f";
+                    break;
+                case "Linux":
+                    symbol = "\ue712";
+                    break;
+            }
+            return symbol;
         }
 
         private static void WriteIDCacheToTempFolder(Dictionary<string, string> idcache)

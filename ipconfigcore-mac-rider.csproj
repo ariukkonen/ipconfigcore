@@ -22,8 +22,8 @@
     <RootNamespace>ipconfigcore</RootNamespace>
     <AssemblyName>ipconfigcore</AssemblyName>
     <Description>- a cross-platform implementation of ipconfig from windows.</Description>
-    <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
    <PropertyGroup Condition="'$(IsWindows)'=='true'">
     <DefineConstants>Windows</DefineConstants>
