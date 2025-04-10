@@ -397,12 +397,12 @@ if(showalldetails)
                         {
                             if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
                             {
+                                if (showalldetails)
+                                {
+                                    addresspreference = "(Preferred)";
+                                }
                                 if (ipv6count.Equals(0) && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    if (showalldetails)
-                                    {
-                                        addresspreference = "(Preferred)";
-                                    }
                                     Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString()+ addresspreference);
                                 }
                                 else if (ipv6count > 0 && ip.Address.ToString().StartsWith("2001:"))
