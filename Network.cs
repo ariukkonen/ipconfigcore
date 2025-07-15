@@ -159,7 +159,6 @@ namespace ipconfigcore
         {
             string dotsymbol = usenerdsymbols ? "\uec07" : ".";
             string colonsymbol = usenerdsymbols ? "\ueb10" : ":";
-            string startcap = usenerdsymbols ? "\u2261 " : "";
             string endcap = usenerdsymbols ? " \u2261" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
@@ -319,6 +318,7 @@ if(showalldetails)
                 string macaddress = adapter.GetPhysicalAddress().ToString();
 
                 string adaptertitle = GetAdapterTitle(adapter.NetworkInterfaceType.ToString(), adapter.Name);
+                string startcap = GetStartCap(adaptertitle,usenerdsymbols);
                 Console.WriteLine();
                 Console.WriteLine("{0}{1}{2}",startcap,adaptertitle,endcap);
                 Console.WriteLine();
@@ -589,6 +589,35 @@ if(showalldetails)
             {
                 WriteIDCacheToTempFolder(idcache);
             }
+        }
+
+        private static string GetStartCap(string adaptertitle, bool usenerdsymbols)
+        {
+            string standardcap = usenerdsymbols ? "\u2261 " : "";
+            string ethernetcap = "\U000F0200 ";
+            string wificap = "\U000F05a9 ";
+            string vpncap = "\U000F0582 ";
+
+            string retval;
+            if (adaptertitle.Contains("Ethernet"))
+            {
+                retval = ethernetcap;
+            }
+            else if (adaptertitle.Contains("Wireless") && usenerdsymbols)
+            {
+                retval = wificap;
+            }
+            else if (adaptertitle.Contains("Tunnel") && usenerdsymbols)
+
+            {
+                retval = vpncap;
+            }
+            else
+            {
+                retval = standardcap;
+            }
+
+            return retval;
         }
 
         public static string GetPlatformSymbol(string platform)
