@@ -599,7 +599,7 @@ if(showalldetails)
             string vpncap = "\U000F0582 ";
 
             string retval;
-            if (adaptertitle.Contains("Ethernet"))
+            if (adaptertitle.Contains("Ethernet") && usenerdsymbols)
             {
                 retval = ethernetcap;
             }
