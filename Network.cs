@@ -159,7 +159,7 @@ namespace ipconfigcore
         {
             string dotsymbol = usenerdsymbols ? "\uec07" : ".";
             string colonsymbol = usenerdsymbols ? "\ueb10" : ":";
-            string endcap = usenerdsymbols ? " \u2261" : ":";
+            string endcap = usenerdsymbols ? "\ue0b4" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
             string platform = GetOSPlatform();
@@ -320,7 +320,7 @@ if(showalldetails)
                 string adaptertitle = GetAdapterTitle(adapter.NetworkInterfaceType.ToString(), adapter.Name);
                 string startcap = GetStartCap(adaptertitle,usenerdsymbols);
                 Console.WriteLine();
-                Console.WriteLine("{0}{1}{2}",startcap,adaptertitle,endcap);
+                WriteTitle(startcap, adaptertitle, endcap, usenerdsymbols);
                 Console.WriteLine();
 
                 IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
@@ -591,15 +591,52 @@ if(showalldetails)
             }
         }
 
+        private static void WriteTitle(string startcap, string adaptertitle, string endcap, bool usenerdsymbols)
+        {
+            string platform = GetOSPlatform();
+            ConsoleColor originalForeground = Console.ForegroundColor;
+            ConsoleColor originalBackground = Console.BackgroundColor;
+            if (usenerdsymbols)
+            {
+
+                // Set inverted colors
+                if (platform == "Windows")
+                {
+                    Console.ForegroundColor = originalBackground;
+                    Console.BackgroundColor = originalForeground;
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+                Console.Write(startcap);
+                Console.Write(adaptertitle+' ');
+                // Reset to the original colors
+                Console.ResetColor();
+                Console.WriteLine(endcap);
+            }
+            else
+            {
+                Console.WriteLine("{0}{1}{2}", startcap, adaptertitle, endcap);
+            }
+
+        }
+
         private static string GetStartCap(string adaptertitle, bool usenerdsymbols)
         {
-            string standardcap = usenerdsymbols ? "\u2261 " : "";
-            string ethernetcap = "\U000F0200 ";
-            string wificap = "\U000F05a9 ";
-            string vpncap = "\U000F0582 ";
+            string standardcap = usenerdsymbols ? " \ue0b6 " : "";
+            string ethernetcap = " \U000F0201 ";
+            string wificap = " \U000F05a9 ";
+            string vpncap = " \U000F0582 ";
+            string btcap = " \U000f00af "; 
+            string retval = string.Empty;
 
-            string retval;
-            if (adaptertitle.Contains("Ethernet") && usenerdsymbols)
+            if (adaptertitle.Contains("Bluetooth") && usenerdsymbols)
+            {
+                retval = btcap;
+            }
+            else if (adaptertitle.Contains("Ethernet") && usenerdsymbols && string.IsNullOrWhiteSpace(retval))
             {
                 retval = ethernetcap;
             }
@@ -828,11 +865,15 @@ if(showalldetails)
             {
                 title = "Wireless LAN adapter" + ' ' + name;
             }
+            else if (name.Contains("Bluetooth"))
+            {
+                title = "Bluetooth adapter" + ' ' + name;
+            }
             else if (adaptertype.Contains("Ethernet"))
             {
                 title = "Ethernet adapter" + ' ' + name;
             }
-            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53")) 
+            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53"))
             {
                 title = "Tunnel adapter" + ' ' + name;
             }
