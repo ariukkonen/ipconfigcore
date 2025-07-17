@@ -593,28 +593,21 @@ if(showalldetails)
 
         private static void WriteTitle(string startcap, string adaptertitle, string endcap, bool usenerdsymbols)
         {
-            string platform = GetOSPlatform();
             ConsoleColor originalForeground = Console.ForegroundColor;
             ConsoleColor originalBackground = Console.BackgroundColor;
             if (usenerdsymbols)
             {
 
                 // Set inverted colors
-                if (platform == "Windows")
-                {
-                    Console.ForegroundColor = originalBackground;
-                    Console.BackgroundColor = originalForeground;
-                }
-                else
-                {
-                    Console.BackgroundColor = ConsoleColor.White;
-                    Console.ForegroundColor = ConsoleColor.Black;
-                }
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Black;
                 Console.Write(startcap);
                 Console.Write(adaptertitle+' ');
                 // Reset to the original colors
                 Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(endcap);
+                Console.ResetColor();
             }
             else
             {
