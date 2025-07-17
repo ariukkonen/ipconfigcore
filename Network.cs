@@ -866,7 +866,7 @@ if(showalldetails)
             {
                 title = "Ethernet adapter" + ' ' + name;
             }
-            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53"))
+            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53") || name.Contains("ipsec"))
             {
                 title = "Tunnel adapter" + ' ' + name;
             }
