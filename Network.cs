@@ -618,7 +618,7 @@ if(showalldetails)
 
         private static string GetStartCap(string adaptertitle, bool usenerdsymbols)
         {
-            string standardcap = usenerdsymbols ? " \ue0b6 " : "";
+            string standardcap = usenerdsymbols ? " \u2261 " : "";
             string ethernetcap = " \U000F0201 ";
             string wificap = " \U000F05a9 ";
             string vpncap = " \U000F0582 ";
