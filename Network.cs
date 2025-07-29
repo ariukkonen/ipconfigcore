@@ -593,28 +593,21 @@ if(showalldetails)
 
         private static void WriteTitle(string startcap, string adaptertitle, string endcap, bool usenerdsymbols)
         {
-            string platform = GetOSPlatform();
             ConsoleColor originalForeground = Console.ForegroundColor;
             ConsoleColor originalBackground = Console.BackgroundColor;
             if (usenerdsymbols)
             {
 
                 // Set inverted colors
-                if (platform == "Windows")
-                {
-                    Console.ForegroundColor = originalBackground;
-                    Console.BackgroundColor = originalForeground;
-                }
-                else
-                {
-                    Console.BackgroundColor = ConsoleColor.White;
-                    Console.ForegroundColor = ConsoleColor.Black;
-                }
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Black;
                 Console.Write(startcap);
                 Console.Write(adaptertitle+' ');
                 // Reset to the original colors
                 Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(endcap);
+                Console.ResetColor();
             }
             else
             {
@@ -625,7 +618,7 @@ if(showalldetails)
 
         private static string GetStartCap(string adaptertitle, bool usenerdsymbols)
         {
-            string standardcap = usenerdsymbols ? " \ue0b6 " : "";
+            string standardcap = usenerdsymbols ? " \u2261 " : "";
             string ethernetcap = " \U000F0201 ";
             string wificap = " \U000F05a9 ";
             string vpncap = " \U000F0582 ";
@@ -873,7 +866,7 @@ if(showalldetails)
             {
                 title = "Ethernet adapter" + ' ' + name;
             }
-            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53"))
+            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53") || name.Contains("ipsec"))
             {
                 title = "Tunnel adapter" + ' ' + name;
             }
