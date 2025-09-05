@@ -157,8 +157,8 @@ namespace ipconfigcore
         }
         public static void DisplayIPNetworkInterfaces(bool showalldetails = false, bool usenerdsymbols = false) 
         {
-            string dotsymbol = usenerdsymbols ? "\uec07" : ".";
-            string colonsymbol = usenerdsymbols ? "\ueb10" : ":";
+            string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
+            string colonsymbol = usenerdsymbols ? "\uea9f" : ":";
             string endcap = usenerdsymbols ? "\ue0b4" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
