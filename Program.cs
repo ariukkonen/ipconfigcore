@@ -111,7 +111,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             var ips = Network.GetAllIPAddresses();
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
             var hostname = Network.GetFQDN();
-            Console.WriteLine("Hostname: {0}", hostname);
+            Console.WriteLine("Hostname: {0}\n", hostname);
+            Console.WriteLine(UnderlineText("Address Type:".PadRight(20)) +'\t'+UnderlineText("Address:".PadRight(40)) +'\t'+UnderlineText("Name:".PadRight(15)) +'\t'+UnderlineText("Interface Type:"));
             foreach (IPAddress? ip in ips)
             {
                 string tmp = ip.ToString();
@@ -120,13 +121,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 {
                     string[] parts = tmp.Split('%');
                     int index = int.Parse(parts[1]) - 1;
-                    interfacename = ifaces[index].Name + ' ' + ifaces[index].NetworkInterfaceType + ' ' + ifaces[index].GetIPProperties().DnsSuffix;
+                    interfacename = ifaces[index].Name.PadRight(15) + "\t" + ifaces[index].NetworkInterfaceType + "\t" + ifaces[index].GetIPProperties().DnsSuffix;
                 }
-                Console.WriteLine("{0}{1} Address: {2} {3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString(), interfacename);
+                Console.WriteLine("{0}{1} Address:\t{2}\t{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().PadRight(40), interfacename);
             }
             string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("Public IPv{0} Address: {1}",publicip.Contains(":") ? "6" :"4", publicip);
+            Console.WriteLine("Public IPv{0} Address:\t{1}",publicip.Contains(":") ? "6" :"4", publicip);
 
+        }
+
+        private static string UnderlineText(string input)
+        {
+            string underlinedText = "\u001b[4m"+input+"\u001b[0m";
+            return underlinedText;
         }
 
         private static void PrintUsage()
