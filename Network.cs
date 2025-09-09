@@ -593,14 +593,9 @@ if(showalldetails)
 
         private static void WriteTitle(string startcap, string adaptertitle, string endcap, bool usenerdsymbols)
         {
-            ConsoleColor originalForeground = Console.ForegroundColor;
-            ConsoleColor originalBackground = Console.BackgroundColor;
             if (usenerdsymbols)
             {
-
-                // Set inverted colors
-                Console.BackgroundColor = ConsoleColor.White;
-                Console.ForegroundColor = ConsoleColor.Black;
+                Program.InvertColours();
                 Console.Write(startcap);
                 Console.Write(adaptertitle+' ');
                 // Reset to the original colors

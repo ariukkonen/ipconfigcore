@@ -106,34 +106,63 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         private static void DisplaySummary(bool usenerdsymbols)
         {
             string platform = Network.GetOSPlatform();
-            
+            string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
+            string colonsymbol = usenerdsymbols ? "\uea9f" : ":";
+
+            string twospaces = "  ";
             Console.WriteLine("{0} IP configuration Summary",usenerdsymbols ? Network.GetPlatformSymbol(platform) + " "+platform : platform);
             var ips = Network.GetAllIPAddresses();
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
             var hostname = Network.GetFQDN();
             Console.WriteLine("Hostname: {0}\n", hostname);
-            Console.WriteLine(UnderlineText("Address Type:".PadRight(20)) +'\t'+UnderlineText("Address:".PadRight(40)) +'\t'+UnderlineText("Name:".PadRight(15)) +'\t'+UnderlineText("Interface Type:"));
-            foreach (IPAddress? ip in ips)
+            if (usenerdsymbols)
             {
-                string tmp = ip.ToString();
-                string interfacename = string.Empty;
-                if (tmp.Contains('%'))
-                {
-                    string[] parts = tmp.Split('%');
-                    int index = int.Parse(parts[1]) - 1;
-                    interfacename = ifaces[index].Name.PadRight(15) + "\t" + ifaces[index].NetworkInterfaceType + "\t" + ifaces[index].GetIPProperties().DnsSuffix;
-                }
-                Console.WriteLine("{0}{1} Address:\t{2}\t{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().PadRight(40), interfacename);
+                InvertColours();
+                UnderlineText();
+                Console.Write("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(15) + twospaces + "Interface Type");
+                UnderLineOff();
+                Console.WriteLine();
+                Console.ResetColor();
             }
+            else
+            {
+                UnderlineText();
+                Console.WriteLine("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(15) + twospaces + "Interface Type");
+                UnderLineOff();
+            }
+
+
+            foreach (IPAddress? ip in ips)
+                {
+                    string tmp = ip.ToString();
+                    string interfacename = string.Empty;
+                    if (tmp.Contains('%'))
+                    {
+                        string[] parts = tmp.Split('%');
+                        int index = int.Parse(parts[1]) - 1;
+                        interfacename = ifaces[index].Name.PadRight(15) + twospaces + ifaces[index].NetworkInterfaceType + twospaces + ifaces[index].GetIPProperties().DnsSuffix;
+                    }
+                    Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".",dotsymbol).PadRight(40), interfacename, twospaces,colonsymbol);
+                }
             string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("Public IPv{0} Address:\t{1}",publicip.Contains(":") ? "6" :"4", publicip);
+            Console.WriteLine("Public IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip,twospaces,colonsymbol);
 
         }
 
-        private static string UnderlineText(string input)
+        public static void InvertColours()
         {
-            string underlinedText = "\u001b[4m"+input+"\u001b[0m";
-            return underlinedText;
+            // Set inverted colors
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
+        public static void UnderlineText()
+        {
+            Console.Write("\u001b[4m");
+        }
+
+        public static void UnderLineOff()
+        {
+            Console.Write("\u001b[0m");
         }
 
         private static void PrintUsage()
