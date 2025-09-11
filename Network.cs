@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -1045,37 +1046,47 @@ if(showalldetails)
             }
             return returnval;
         }
-        public static List<IPAddress?> GetAllIPAddresses()
+        public static Dictionary<int,List<IPAddress?>> GetAllIPAddresses()
         {
-            List<IPAddress?> ips = new List<IPAddress?>();
+            Dictionary<int,List<IPAddress?>> ips = new Dictionary<int, List<IPAddress?>>();
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
-
-            foreach (IPAddress? ip in host.AddressList.Where(ip => (ip.AddressFamily == AddressFamily.InterNetwork || ip.AddressFamily == AddressFamily.InterNetworkV6)))
+            int index = 0;
+            foreach (var adapter in ifaces)
             {
-                if (!exceptionpatterns.Contains(ip.ToString()))
+                List<IPAddress?> tmpips = new List<IPAddress?>();
+                foreach (UnicastIPAddressInformation ip in adapter.GetIPProperties().UnicastAddresses)
                 {
-                    string tmp = ip.ToString();
-                    if (tmp.Contains('%'))
+                    if (!exceptionpatterns.Contains(ip.Address.ToString()))
                     {
-                        string[] parts = tmp.Split('%');
-                        int index = int.Parse(parts[1]) - 1;
-                        if (index >= ifaces.Count()) 
+                        string tmp = ip.Address.ToString();
+                        if (tmp.Contains('%'))
                         {
-                            continue;
+                            if (adapter.OperationalStatus.Equals(OperationalStatus.Up))
+                            {
+                                tmpips.Add(ip.Address);
+                            }
                         }
-                        if (ifaces[index].OperationalStatus.Equals(OperationalStatus.Up))
+                        else
                         {
-                            ips.Add(ip);
+                            if (adapter.OperationalStatus.Equals(OperationalStatus.Up))
+                            {
+                                tmpips.Add(ip.Address);
+                            }
                         }
-                    }
-                    else
-                    {
-                        ips.Add(ip);
                     }
                 }
 
+                if (tmpips.Count > 0)
+                {
+                    List<IPAddress?> iplist = new List<IPAddress?>();
+                    iplist.AddRange(tmpips);
+                    ips.Add(index, iplist);
+                    tmpips.Clear();
+                }
+                index ++;
             }
+            
             return ips;
         }
         public static int GetAvailablePort(int startingPort)

@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             {
                 InvertColours();
                 UnderlineText();
-                Console.Write("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(15) + twospaces + "Interface Type".PadRight(20));
+                Console.Write("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(35) + twospaces + "Interface Type".PadRight(20));
                 UnderLineOff();
                 Console.WriteLine();
                 Console.ResetColor();
@@ -126,25 +126,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             else
             {
                 UnderlineText();
-                Console.WriteLine("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(15) + twospaces + "Interface Type".PadRight(20));
+                Console.WriteLine("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(35) + twospaces + "Interface Type".PadRight(20));
                 UnderLineOff();
             }
 
 
-            foreach (IPAddress? ip in ips)
-                {
-                    string tmp = ip.ToString();
+            foreach (var item in ips)
+            {
+
                     string interfacename = string.Empty;
-                    if (tmp.Contains('%'))
+                    interfacename = ifaces[item.Key].Name.PadRight(35).Substring(0,35) + twospaces + GetAdapterType(ifaces[item.Key].NetworkInterfaceType.ToString(), ifaces[item.Key].Name).PadRight(20) + twospaces + ifaces[item.Key].GetIPProperties().DnsSuffix;
+                    foreach (var ip in item.Value)
                     {
-                        string[] parts = tmp.Split('%');
-                        int index = int.Parse(parts[1]) - 1;
-                        interfacename = ifaces[index].Name.PadRight(15) + twospaces + GetAdapterType(ifaces[index].NetworkInterfaceType.ToString(), ifaces[index].Name).PadRight(20) + twospaces + ifaces[index].GetIPProperties().DnsSuffix;
+                        Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".", dotsymbol).PadRight(40), interfacename, twospaces, colonsymbol);
                     }
-                    Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".",dotsymbol).PadRight(40), interfacename, twospaces,colonsymbol);
-                }
+            }
+            Console.WriteLine();
             string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("Public IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol), twospaces,colonsymbol);
+            Console.WriteLine("External IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol), twospaces,colonsymbol);
 
         }
         public static string GetAdapterType(string adaptertype, string name)
