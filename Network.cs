@@ -317,7 +317,7 @@ if(showalldetails)
                 }
                 string macaddress = adapter.GetPhysicalAddress().ToString();
 
-                string adaptertitle = GetAdapterTitle(adapter.NetworkInterfaceType.ToString(), adapter.Name);
+                string adaptertitle = Program.GetAdapterType(adapter.NetworkInterfaceType.ToString(), adapter.Name)+' '+ adapter.Name;
                 string startcap = GetStartCap(adaptertitle,usenerdsymbols);
                 Console.WriteLine();
                 WriteTitle(startcap, adaptertitle, endcap, usenerdsymbols);
@@ -846,31 +846,7 @@ if(showalldetails)
 
         }
 
-        private static string GetAdapterTitle(string adaptertype, string name)
-        {
-            string title = string.Empty;
-            if (adaptertype.Contains("Wireless"))
-            {
-                title = "Wireless LAN adapter" + ' ' + name;
-            }
-            else if (name.Contains("Bluetooth"))
-            {
-                title = "Bluetooth adapter" + ' ' + name;
-            }
-            else if (adaptertype.Contains("Ethernet"))
-            {
-                title = "Ethernet adapter" + ' ' + name;
-            }
-            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53") || name.Contains("ipsec"))
-            {
-                title = "Tunnel adapter" + ' ' + name;
-            }
-            else
-            {
-                title = "Unknown adapter" + ' ' + name;
-            }
-            return title;
-        }
+
 
         private static string GetNetBiosStatusinWindows()
         {
