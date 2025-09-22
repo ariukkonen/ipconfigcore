@@ -159,7 +159,7 @@ namespace ipconfigcore
         public static void DisplayIPNetworkInterfaces(bool showalldetails = false, bool usenerdsymbols = false) 
         {
             string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
-            string colonsymbol = usenerdsymbols ? "\uea9f" : ":";
+            string colonsymbol = usenerdsymbols ? "\u02D0" : ":";
             string endcap = usenerdsymbols ? "\ue0b4" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
@@ -404,15 +404,15 @@ if(showalldetails)
                                 }
                                 if (ipv6count.Equals(0) && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString()+ addresspreference);
+                                    Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 else if (ipv6count > 0 && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    Console.WriteLine("   Temporary IPv6 Address{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Temporary IPv6 Address{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("   Link-local IPv6 Address {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Link-local IPv6 Address {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 if (ip.Address.ToString().StartsWith("2001:"))
                                     ipv6count++;
@@ -437,8 +437,8 @@ if(showalldetails)
                                 {
                                     addresspreference = "(Preferred)";
                                 }
-                                Console.WriteLine("   IPv4 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
-                                Console.WriteLine("   Subnet Mask {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.IPv4Mask.ToString());
+                                Console.WriteLine("   IPv4 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(".",dotsymbol) + addresspreference);
+                                Console.WriteLine("   Subnet Mask {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.IPv4Mask.ToString().Replace(".",dotsymbol));
 #if Windows
                                 if (platform.Equals("Windows")) 
                                 {
@@ -472,11 +472,11 @@ if(showalldetails)
                         }
                         if (adapterProperties.GatewayAddresses.Count > 0)
                         {
-                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.GatewayAddresses[0].Address.ToString());
+                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.GatewayAddresses[0].Address.ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                             int i = 1;
                             while (i < adapterProperties.GatewayAddresses.Count)
                             {
-                                Console.WriteLine("                                       {0}", adapterProperties.GatewayAddresses[i].Address.ToString());
+                                Console.WriteLine("                                       {0}", adapterProperties.GatewayAddresses[i].Address.ToString().Replace(".",dotsymbol).Replace(":", colonsymbol));
                                 i++;
                             }
                         }
@@ -490,7 +490,7 @@ if(showalldetails)
 #if !OSX
                             foreach (var dhcpaddress in adapterProperties.DhcpServerAddresses)
                             {
-                                Console.WriteLine("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, dhcpaddress);
+                                Console.WriteLine("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, dhcpaddress.ToString().Replace(".",dotsymbol).Replace(":", colonsymbol));
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
@@ -538,12 +538,12 @@ if(showalldetails)
                             }
                             if (filtereddnslist.Count > 0)
                             {
-                                Console.WriteLine("   DNS Servers {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, filtereddnslist[0].ToString());
+                                Console.WriteLine("   DNS Servers {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, filtereddnslist[0].ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                                 int i = 1;
                                 while (i < filtereddnslist.Count)
                                 {
 
-                                Console.WriteLine("                                       {0}", filtereddnslist[i].ToString());
+                                Console.WriteLine("                                       {0}", filtereddnslist[i].ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                                     i++;
                                 }
                             }

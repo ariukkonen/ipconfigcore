@@ -107,7 +107,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         {
             string platform = Network.GetOSPlatform();
             string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
-            string colonsymbol = usenerdsymbols ? "\uea9f" : ":";
+            string colonsymbol = usenerdsymbols ? "\u02D0" : ":";
             string twospaces = "  ";
             Console.WriteLine("{0} IP configuration Summary",usenerdsymbols ? Network.GetPlatformSymbol(platform) + " "+platform : platform);
             var ips = Network.GetAllIPAddresses();
@@ -138,12 +138,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     interfacename = ifaces[item.Key].Name.PadRight(35).Substring(0,35) + twospaces + GetAdapterType(ifaces[item.Key].NetworkInterfaceType.ToString(), ifaces[item.Key].Name).PadRight(20) + twospaces + ifaces[item.Key].GetIPProperties().DnsSuffix;
                     foreach (var ip in item.Value)
                     {
-                        Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".", dotsymbol).PadRight(40), interfacename, twospaces, colonsymbol);
+                        Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".", dotsymbol).Replace(":",colonsymbol).PadRight(40), interfacename, twospaces, colonsymbol);
                     }
             }
             Console.WriteLine();
             string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("External IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol), twospaces,colonsymbol);
+            Console.WriteLine("External IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol).Replace(":",colonsymbol), twospaces,colonsymbol);
 
         }
         public static string GetAdapterType(string adaptertype, string name)
