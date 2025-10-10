@@ -106,27 +106,85 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         private static void DisplaySummary(bool usenerdsymbols)
         {
             string platform = Network.GetOSPlatform();
-            
+            string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
+            string colonsymbol = usenerdsymbols ? "\u02D0" : ":";
+            string twospaces = "  ";
             Console.WriteLine("{0} IP configuration Summary",usenerdsymbols ? Network.GetPlatformSymbol(platform) + " "+platform : platform);
             var ips = Network.GetAllIPAddresses();
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
             var hostname = Network.GetFQDN();
-            Console.WriteLine("Hostname: {0}", hostname);
-            foreach (IPAddress? ip in ips)
+            Console.WriteLine("Hostname: {0}\n", hostname);
+            if (usenerdsymbols)
             {
-                string tmp = ip.ToString();
-                string interfacename = string.Empty;
-                if (tmp.Contains('%'))
-                {
-                    string[] parts = tmp.Split('%');
-                    int index = int.Parse(parts[1]) - 1;
-                    interfacename = ifaces[index].Name + ' ' + ifaces[index].NetworkInterfaceType + ' ' + ifaces[index].GetIPProperties().DnsSuffix;
-                }
-                Console.WriteLine("{0}{1} Address: {2} {3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString(), interfacename);
+                InvertColours();
+                UnderlineText();
+                Console.Write("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(35) + twospaces + "Interface Type".PadRight(20));
+                UnderLineOff();
+                Console.WriteLine();
+                Console.ResetColor();
             }
-            string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("Public IPv{0} Address: {1}",publicip.Contains(":") ? "6" :"4", publicip);
+            else
+            {
+                UnderlineText();
+                Console.WriteLine("Address Type".PadLeft(20) + twospaces + "Address".PadRight(40) + twospaces + "Name".PadRight(35) + twospaces + "Interface Type".PadRight(20));
+                UnderLineOff();
+            }
 
+
+            foreach (var item in ips)
+            {
+
+                    string interfacename = string.Empty;
+                    interfacename = ifaces[item.Key].Name.PadRight(35).Substring(0,35) + twospaces + GetAdapterType(ifaces[item.Key].NetworkInterfaceType.ToString(), ifaces[item.Key].Name).PadRight(20) + twospaces + ifaces[item.Key].GetIPProperties().DnsSuffix;
+                    foreach (var ip in item.Value)
+                    {
+                        Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".", dotsymbol).Replace(":",colonsymbol).PadRight(40), interfacename, twospaces, colonsymbol);
+                    }
+            }
+            Console.WriteLine();
+            string publicip = Network.GetPublicIpAddressAsync().Result;
+            Console.WriteLine("External IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol).Replace(":",colonsymbol), twospaces,colonsymbol);
+
+        }
+        public static string GetAdapterType(string adaptertype, string name)
+        {
+            string type = string.Empty;
+            if (adaptertype.Contains("Wireless"))
+            {
+                type = "Wireless LAN adapter";
+            }
+            else if (name.Contains("Bluetooth"))
+            {
+                type = "Bluetooth adapter";
+            }
+            else if (adaptertype.Contains("Ethernet"))
+            {
+                type = "Ethernet adapter";
+            }
+            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53") || name.Contains("ipsec"))
+            {
+                type = "Tunnel adapter";
+            }
+            else
+            {
+                type = "Unknown adapter";
+            }
+            return type;
+        }
+        public static void InvertColours()
+        {
+            // Set inverted colors
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
+        public static void UnderlineText()
+        {
+            Console.Write("\u001b[4m");
+        }
+
+        public static void UnderLineOff()
+        {
+            Console.Write("\u001b[0m");
         }
 
         private static void PrintUsage()

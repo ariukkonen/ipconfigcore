@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -157,8 +158,8 @@ namespace ipconfigcore
         }
         public static void DisplayIPNetworkInterfaces(bool showalldetails = false, bool usenerdsymbols = false) 
         {
-            string dotsymbol = usenerdsymbols ? "\uec07" : ".";
-            string colonsymbol = usenerdsymbols ? "\ueb10" : ":";
+            string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
+            string colonsymbol = usenerdsymbols ? "\u02D0" : ":";
             string endcap = usenerdsymbols ? "\ue0b4" : ":";
             string netbiosstatus = "Unknown";
             string lifeTimeFormat;
@@ -317,7 +318,7 @@ if(showalldetails)
                 }
                 string macaddress = adapter.GetPhysicalAddress().ToString();
 
-                string adaptertitle = GetAdapterTitle(adapter.NetworkInterfaceType.ToString(), adapter.Name);
+                string adaptertitle = Program.GetAdapterType(adapter.NetworkInterfaceType.ToString(), adapter.Name)+' '+ adapter.Name;
                 string startcap = GetStartCap(adaptertitle,usenerdsymbols);
                 Console.WriteLine();
                 WriteTitle(startcap, adaptertitle, endcap, usenerdsymbols);
@@ -403,15 +404,15 @@ if(showalldetails)
                                 }
                                 if (ipv6count.Equals(0) && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString()+ addresspreference);
+                                    Console.WriteLine("   IPv6 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 else if (ipv6count > 0 && ip.Address.ToString().StartsWith("2001:"))
                                 {
-                                    Console.WriteLine("   Temporary IPv6 Address{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Temporary IPv6 Address{0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("   Link-local IPv6 Address {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
+                                    Console.WriteLine("   Link-local IPv6 Address {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(":", colonsymbol) + addresspreference);
                                 }
                                 if (ip.Address.ToString().StartsWith("2001:"))
                                     ipv6count++;
@@ -436,8 +437,8 @@ if(showalldetails)
                                 {
                                     addresspreference = "(Preferred)";
                                 }
-                                Console.WriteLine("   IPv4 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString() + addresspreference);
-                                Console.WriteLine("   Subnet Mask {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.IPv4Mask.ToString());
+                                Console.WriteLine("   IPv4 Address{0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.Address.ToString().Replace(".",dotsymbol) + addresspreference);
+                                Console.WriteLine("   Subnet Mask {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, ip.IPv4Mask.ToString().Replace(".",dotsymbol));
 #if Windows
                                 if (platform.Equals("Windows")) 
                                 {
@@ -471,11 +472,11 @@ if(showalldetails)
                         }
                         if (adapterProperties.GatewayAddresses.Count > 0)
                         {
-                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.GatewayAddresses[0].Address.ToString());
+                            Console.WriteLine("   Default Gateway {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, adapterProperties.GatewayAddresses[0].Address.ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                             int i = 1;
                             while (i < adapterProperties.GatewayAddresses.Count)
                             {
-                                Console.WriteLine("                                       {0}", adapterProperties.GatewayAddresses[i].Address.ToString());
+                                Console.WriteLine("                                       {0}", adapterProperties.GatewayAddresses[i].Address.ToString().Replace(".",dotsymbol).Replace(":", colonsymbol));
                                 i++;
                             }
                         }
@@ -489,7 +490,7 @@ if(showalldetails)
 #if !OSX
                             foreach (var dhcpaddress in adapterProperties.DhcpServerAddresses)
                             {
-                                Console.WriteLine("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, dhcpaddress);
+                                Console.WriteLine("   DHCP Server {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, dhcpaddress.ToString().Replace(".",dotsymbol).Replace(":", colonsymbol));
                             }
                             if(!string.IsNullOrEmpty(macaddress))
                             {
@@ -537,12 +538,12 @@ if(showalldetails)
                             }
                             if (filtereddnslist.Count > 0)
                             {
-                                Console.WriteLine("   DNS Servers {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, filtereddnslist[0].ToString());
+                                Console.WriteLine("   DNS Servers {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {0} {1} {2}", dotsymbol, colonsymbol, filtereddnslist[0].ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                                 int i = 1;
                                 while (i < filtereddnslist.Count)
                                 {
 
-                                Console.WriteLine("                                       {0}", filtereddnslist[i].ToString());
+                                Console.WriteLine("                                       {0}", filtereddnslist[i].ToString().Replace(".", dotsymbol).Replace(":", colonsymbol));
                                     i++;
                                 }
                             }
@@ -593,14 +594,9 @@ if(showalldetails)
 
         private static void WriteTitle(string startcap, string adaptertitle, string endcap, bool usenerdsymbols)
         {
-            ConsoleColor originalForeground = Console.ForegroundColor;
-            ConsoleColor originalBackground = Console.BackgroundColor;
             if (usenerdsymbols)
             {
-
-                // Set inverted colors
-                Console.BackgroundColor = ConsoleColor.White;
-                Console.ForegroundColor = ConsoleColor.Black;
+                Program.InvertColours();
                 Console.Write(startcap);
                 Console.Write(adaptertitle+' ');
                 // Reset to the original colors
@@ -851,31 +847,7 @@ if(showalldetails)
 
         }
 
-        private static string GetAdapterTitle(string adaptertype, string name)
-        {
-            string title = string.Empty;
-            if (adaptertype.Contains("Wireless"))
-            {
-                title = "Wireless LAN adapter" + ' ' + name;
-            }
-            else if (name.Contains("Bluetooth"))
-            {
-                title = "Bluetooth adapter" + ' ' + name;
-            }
-            else if (adaptertype.Contains("Ethernet"))
-            {
-                title = "Ethernet adapter" + ' ' + name;
-            }
-            else if (adaptertype.Contains("Tunnel") || name.Contains("utun") || adaptertype.Equals("53") || name.Contains("ipsec"))
-            {
-                title = "Tunnel adapter" + ' ' + name;
-            }
-            else
-            {
-                title = "Unknown adapter" + ' ' + name;
-            }
-            return title;
-        }
+
 
         private static string GetNetBiosStatusinWindows()
         {
@@ -1074,37 +1046,47 @@ if(showalldetails)
             }
             return returnval;
         }
-        public static List<IPAddress?> GetAllIPAddresses()
+        public static Dictionary<int,List<IPAddress?>> GetAllIPAddresses()
         {
-            List<IPAddress?> ips = new List<IPAddress?>();
+            Dictionary<int,List<IPAddress?>> ips = new Dictionary<int, List<IPAddress?>>();
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
-
-            foreach (IPAddress? ip in host.AddressList.Where(ip => (ip.AddressFamily == AddressFamily.InterNetwork || ip.AddressFamily == AddressFamily.InterNetworkV6)))
+            int index = 0;
+            foreach (var adapter in ifaces)
             {
-                if (!exceptionpatterns.Contains(ip.ToString()))
+                List<IPAddress?> tmpips = new List<IPAddress?>();
+                foreach (UnicastIPAddressInformation ip in adapter.GetIPProperties().UnicastAddresses)
                 {
-                    string tmp = ip.ToString();
-                    if (tmp.Contains('%'))
+                    if (!exceptionpatterns.Contains(ip.Address.ToString()))
                     {
-                        string[] parts = tmp.Split('%');
-                        int index = int.Parse(parts[1]) - 1;
-                        if (index >= ifaces.Count()) 
+                        string tmp = ip.Address.ToString();
+                        if (tmp.Contains('%'))
                         {
-                            continue;
+                            if (adapter.OperationalStatus.Equals(OperationalStatus.Up))
+                            {
+                                tmpips.Add(ip.Address);
+                            }
                         }
-                        if (ifaces[index].OperationalStatus.Equals(OperationalStatus.Up))
+                        else
                         {
-                            ips.Add(ip);
+                            if (adapter.OperationalStatus.Equals(OperationalStatus.Up))
+                            {
+                                tmpips.Add(ip.Address);
+                            }
                         }
-                    }
-                    else
-                    {
-                        ips.Add(ip);
                     }
                 }
 
+                if (tmpips.Count > 0)
+                {
+                    List<IPAddress?> iplist = new List<IPAddress?>();
+                    iplist.AddRange(tmpips);
+                    ips.Add(index, iplist);
+                    tmpips.Clear();
+                }
+                index ++;
             }
+            
             return ips;
         }
         public static int GetAvailablePort(int startingPort)
