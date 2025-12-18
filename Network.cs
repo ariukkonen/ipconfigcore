@@ -740,8 +740,7 @@ if(showalldetails)
             try
             {
                 var command = "powershell";
-                var arguments = string.Format(" get-itempropertyvalue \"HKLM:System\\CurrentControlSet\\services\\TCPIP6\\Parameters\\interfaces\\{0}\" -name \"dhcpv6iaid\" ",id);
-
+                var arguments = " (get-itempropertyvalue 'HKLM:System\\CurrentControlSet\\services\\TCPIP6\\Parameters\\interfaces\\" +id+"' -name dhcpv6iaid)";
                 var processInfo = new ProcessStartInfo()
                 {
                     FileName = command,
