@@ -31,14 +31,6 @@
    <PropertyGroup Condition="'$(IsLinux)'=='true'">
     <DefineConstants>Linux</DefineConstants>
    </PropertyGroup>
-   <ItemGroup>
-     <None Remove="getdhcpv6iaid.ps1" />
-   </ItemGroup>
-   <ItemGroup>
-     <Content Include="getdhcpv6iaid.ps1">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     </Content>
-   </ItemGroup>
 	<ItemGroup>
 		<None Remove="LICENSE" />
 	</ItemGroup>
