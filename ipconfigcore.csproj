@@ -4,7 +4,7 @@
 	<AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0.0</Version>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -31,14 +31,6 @@
    <PropertyGroup Condition="'$(IsLinux)'=='true'">
     <DefineConstants>Linux</DefineConstants>
    </PropertyGroup>
-   <ItemGroup>
-     <None Remove="getdhcpv6iaid.ps1" />
-   </ItemGroup>
-   <ItemGroup>
-     <Content Include="getdhcpv6iaid.ps1">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     </Content>
-   </ItemGroup>
 	<ItemGroup>
 		<None Remove="LICENSE" />
 	</ItemGroup>

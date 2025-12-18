@@ -739,10 +739,9 @@ if(showalldetails)
             string result = string.Empty;
             try
             {
-                string strWorkPath = System.AppContext.BaseDirectory;
-                string strps1FilePath = System.IO.Path.Combine(strWorkPath, "getdhcpv6iaid.ps1");
                 var command = "powershell";
-                var arguments = string.Format(" {0} {1}", strps1FilePath, id.Replace("{", "").Replace("}", ""));
+                var arguments = string.Format(" get-itempropertyvalue \"HKLM:System\\CurrentControlSet\\services\\TCPIP6\\Parameters\\interfaces\\{0}\" -name \"dhcpv6iaid\" ",id);
+
                 var processInfo = new ProcessStartInfo()
                 {
                     FileName = command,
