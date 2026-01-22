@@ -2,6 +2,7 @@
 ## ipcofigcore - Written by Ari Ukkonen
 
 **ipconfigcore** is a cross-platform implementation of ipconfig viewing functionality for windows and macos written in .NET 10 (Core).
+
 Note: One powershell script was previously included for windows to query the registry called **getdhcpv6iaid.ps1**, however, the code has been 
 to not require the script and instead uses inline powershell calls sent to the shell.
 
