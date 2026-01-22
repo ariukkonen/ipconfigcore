@@ -1,9 +1,9 @@
 # ipconfigcore
 ## ipcofigcore - Written by Ari Ukkonen
 
-**ipconfigcore** is a cross-platform implementation of ipconfig viewing functionality for windows and macos written in .NET 9 (Core).
-One powershell script is included for windows to query the registry called **getdhcpv6iaid.ps1** and this script needs to be included
-with the windows binary in order for it to work on windows.
+**ipconfigcore** is a cross-platform implementation of ipconfig viewing functionality for windows and macos written in .NET 10 (Core).
+Note: One powershell script was previously included for windows to query the registry called **getdhcpv6iaid.ps1**, however, the code has been 
+to not require the script and instead uses inline powershell calls sent to the shell.
 
 ### Usage:
 **ipconfigcore**
@@ -22,7 +22,7 @@ with the windows binary in order for it to work on windows.
 
 ### Building the windows version:
 
-Open **ipconfigcore.sln** in Visual Studio 2022 or later
+Open **ipconfigcore.sln** in Visual Studio 2026 or later
 This solution contains common code with the macos version but has a different project file called **ipconfigcore.csproj**
 
 ### Building the macos version:
@@ -32,12 +32,12 @@ This solution contains common code with the windows version but has a different 
 
 ### Building the linux version:
 
-Open **ipconfigcore-linux.sln** in Visual Studio 2022 or later
+Open **ipconfigcore-linux.sln** in Visual Studio 2026 or later
 This solution contains common code with the windows version but has a different project file called **ipconfigcore-linux.csproj**
 
 
 Note: The windows version of the executable is called **ipconfigcore.exe** and the mac/linux version is called **ipconfigcore** with
-both bundling the **LICENSE** file with the executable and the windows version also bundles with the **getdhcpv6iaid.ps1** powershell script.
+both bundling the **LICENSE** file with the executable.
 
 ### How Platform specific compiler constants are defined
 The first step is to define the following conditions in the main **PropertyGroup**.
