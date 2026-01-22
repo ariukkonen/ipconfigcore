@@ -9,6 +9,7 @@ namespace ipconfigcore
         static void Main(string[] args)
         {
             bool usenerdsymbols = false;
+            bool fetchexternal = false;
 
             if (args.Length == 0)
             {
@@ -21,6 +22,10 @@ namespace ipconfigcore
                     usenerdsymbols = true;
                     Console.OutputEncoding = System.Text.Encoding.UTF8;
                 }
+                if (args.Contains("--fetchip"))
+                {
+                    fetchexternal = true;
+                }
 
                 if (args.Contains("/all", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-all", StringComparer.InvariantCultureIgnoreCase))
                 {
@@ -28,7 +33,7 @@ namespace ipconfigcore
                 }
                 else if (args.Contains("/ips", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-ips", StringComparer.InvariantCultureIgnoreCase))
                 {
-                    DisplaySummary(usenerdsymbols);
+                    DisplaySummary(usenerdsymbols, fetchexternal);
                 }
                 else if (args.Contains("/license", StringComparer.InvariantCultureIgnoreCase) || args.Contains("-license", StringComparer.InvariantCultureIgnoreCase))
                 {
@@ -103,7 +108,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             Console.WriteLine(licensetxt);
         }
 
-        private static void DisplaySummary(bool usenerdsymbols)
+        private static void DisplaySummary(bool usenerdsymbols, bool fetchexternal)
         {
             string platform = Network.GetOSPlatform();
             string dotsymbol = usenerdsymbols ? "\ueb8a" : ".";
@@ -141,9 +146,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         Console.WriteLine("{0}{1} Address{5}{4}{2}{4}{3}", ip.ToString().StartsWith("2001:") ? "Public " : " Local ", ip.ToString().Contains(':') ? "IPv6" : "IPv4", ip.ToString().Replace(".", dotsymbol).Replace(":",colonsymbol).PadRight(40), interfacename, twospaces, colonsymbol);
                     }
             }
-            Console.WriteLine();
-            string publicip = Network.GetPublicIpAddressAsync().Result;
-            Console.WriteLine("External IPv{0} Address{3}{2}{1}",publicip.Contains(":") ? "6" :"4", publicip.Replace(".", dotsymbol).Replace(":",colonsymbol), twospaces,colonsymbol);
+            if (fetchexternal)
+            {
+                Console.WriteLine();
+                string publicip = Network.GetPublicIpAddressAsync().Result;
+                Console.WriteLine("External IPv{0} Address{3}{2}{1}", publicip.Contains(":") ? "6" : "4", publicip.Replace(".", dotsymbol).Replace(":", colonsymbol), twospaces, colonsymbol);
+            }
 
         }
         public static string GetAdapterType(string adaptertype, string name)
@@ -201,6 +209,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             Console.WriteLine("/-license - displays the license");
             Console.WriteLine("Options:");
             Console.WriteLine("--nerd - displays information with nerd font symbols.");
+            Console.WriteLine("--fetchip - fetches external IP address for ips switch.");
         }
     }
 }
