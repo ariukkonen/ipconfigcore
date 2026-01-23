@@ -72,3 +72,18 @@ Finally, we write some operating specific code blocks:
 The OSX code block will execute if the code is runing on MacOS.
 
 Note: Running the linux verison on WLS will not respect the Linux constant properly so there are additonal calls to GetOSPlatform() to deal with issue.
+
+Screenshots:
+<img width="935" height="731" alt="image" src="https://github.com/user-attachments/assets/51c26f93-b7bb-411f-a084-767c9b4575fa" />
+
+Windows 11 with the /all switch and --nerd font option
+
+<img width="895" height="800" alt="image" src="https://github.com/user-attachments/assets/3384cf05-3ddb-417b-8e10-4673b33cecb7" />
+
+Ubuntu on WSL with the /all switch and --nerd font option
+
+<img width="952" height="1153" alt="image" src="https://github.com/user-attachments/assets/7e48832b-eef5-4f87-8b5d-0b03f852384a" />
+
+MacOS with the /all switch and --nerd font option
+
+
