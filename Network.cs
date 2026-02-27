@@ -684,7 +684,7 @@ if(showalldetails)
                 info.Refresh();
                 DateTime modifiedon = info.LastWriteTime;
                 DateTime now = DateTime.Now;
-                if(modifiedon < now.AddMinutes(-30))
+                if(modifiedon < now.AddHours(-12))
                 {
                     File.Delete(tempfilename);
                     return;
